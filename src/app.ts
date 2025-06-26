@@ -11,6 +11,6 @@ app.get('/', (_req, res) => {
   res.send('Bienvenue sur ton forum 👋');
 });
 
-app.use('/api/users', userRoutes);
+app.use('/users', userRoutes);
 
 export default app;
