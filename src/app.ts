@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-import userRoutes from './routes/users';
+import userRouter from './routes/users';
+import submitRouter from './routes/submits';
+import uploadsRouter from './routes/uploads';
 
 const app = express();
 
@@ -11,6 +13,9 @@ app.get('/', (_req, res) => {
   res.send('Bienvenue sur ton forum 👋');
 });
 
-app.use('/users', userRoutes);
+app.use('/users', userRouter);
+app.use('/submits', submitRouter)
+app.use('/uploads', uploadsRouter)
+
 
 export default app;
