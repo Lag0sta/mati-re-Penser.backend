@@ -148,5 +148,47 @@ router.get('/topicsWithThreadCounts', async (req, res) => {
     }
 });
 
+//route pour récupérer les threads d'un topic avec sa description
+router.post('/topicContent', async (req, res) => {
+    try {
+        //recherche des informations concernant le topic
+        const topic = await Topic.findOne({ title: req.body.title })
+                                              .populate({path: 'createdBy',
+                                               select:'pseudo avatar'});;
+
+        if (!topic) {
+            res.json({ result: false, error: 'Topic not found' });
+            return;
+        }
+
+        //recuperation des threads du topic
+        //res.json(threads) == [{},{},{}] => .map pour transformer
+        const threads = await Thread.find({ topic: topic._id })
+                                .populate({path: 'createdBy',
+                                           select:'pseudo avatar'});
+
+        if (!threads) {
+            res.json({ result: false, error: 'Threads not found' });
+            return;
+        }
+
+        const discussion = {
+            title: topic.title,
+            description: topic.description,
+            createdBy: topic.createdBy,
+            creationDate: topic.creationDate,
+            topicThread: threads.map((thread) => ({
+                text: thread.text,
+                createdBy: thread.createdBy,
+                creationDate: thread.creationDate,
+            })),
+        }
+
+        res.json({ result: true, discussion })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ result: false, message: 'Server error' });
+    }
+});
 
 export default router;
