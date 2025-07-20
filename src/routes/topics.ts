@@ -182,8 +182,32 @@ router.put("/editTopic", async (req, res) => {
             return;
         }
 
-        res.json({ result: true, message: 'Sujet mis à jour', topic });
+        res.json({ result: true, success: 'Sujet mis à jour', topic });
 
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ result: false, message: 'Erreur de serveur' });
+    }
+})
+
+router.put("/lockTopic", async (req, res) => {
+    try{
+        const { token, id, isLocked } = req.body;
+        //vérification du token
+        if (!token) {
+            res.json({ result: false, error: 'veuillez vous connecter' })
+        }
+
+        const lockTopic = await Topic.findOneAndUpdate({ _id: id },
+            { isLocked: !isLocked },
+            { new: true, });
+
+        if (!lockTopic) {
+            res.json({ result: false, error: 'Sujet non trouvé' });
+            return;
+        }
+
+        res.json({ result: true, success : "Sujet vérouillé", isLocked: lockTopic.isLocked });
     } catch (error) {
         console.error(error);
         res.status(500).json({ result: false, message: 'Erreur de serveur' });
