@@ -19,6 +19,7 @@
     "@types/express": "^5.0.3",
     "@types/multer": "^1.4.13",
     "@types/node": "^24.0.3",
+    "@vercel/node": "^5.3.6",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
