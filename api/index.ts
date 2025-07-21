@@ -8,7 +8,6 @@ dotenv.config()
 
 
   const connStr = process.env.CONNECTION_STRING || ''
-
   const client = new MongoClient(connStr)
   let clientPromise: Promise<MongoClient> | null = null;
 
@@ -19,13 +18,8 @@ async function getClient() {
   return clientPromise;
 }
 
-const serverlessHandler = serverless(app);
+await getClient(); // Assure la connexion au lancement (optionnel, mais plus propre)
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  try {
-    await getClient();
-        return serverlessHandler(req, res);
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-}
+const handler = serverless(app);
+
+export default handler;

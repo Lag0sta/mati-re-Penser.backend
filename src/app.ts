@@ -26,6 +26,10 @@ app.get('/', (_req, res) => {
   res.send('Bienvenue sur ton forum 👋');
 });
 
+app.get('/test', (_req, res) => {
+  res.send('Route test OK');
+});
+
 app.use('/auths', authRouter);
 app.use('/users', userRouter);
 app.use('/topics', topicRouter)
