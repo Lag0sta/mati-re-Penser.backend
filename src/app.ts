@@ -8,7 +8,16 @@ import uploadsRouter from './routes/uploads';
 
 const app = express();
 
-app.use(cors());
+// CORS dynamique selon l'environnement
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? 'https://ton-frontend.vercel.app' // ← remplace par ton vrai domaine
+    : 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get('/', (_req, res) => {
