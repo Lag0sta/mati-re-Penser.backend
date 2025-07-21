@@ -13,9 +13,19 @@ const handler = serverless(app)
 export default async function (req: VercelRequest, res: VercelResponse) {
   if (!isConnected) {
     const connStr = process.env.CONNECTION_STRING || ''
-    await connectToDatabase(connStr)
-    isConnected = true
+    console.log('🚀 Tentative de connexion à la DB avec:', connStr)
+
+    try {
+      await connectToDatabase(connStr)
+      isConnected = true
+      console.log('✅ Data Connected')
+    } catch (error) {
+      console.error('❌ Erreur de connexion à la DB:', error)
+      // On répond avec une erreur 500 pour éviter le timeout
+      return res.status(500).json({ error: 'Impossible de se connecter à la base de données' })
+    }
   }
+
 
   return handler(req, res)
 }
