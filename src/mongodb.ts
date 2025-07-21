@@ -1,27 +1,22 @@
-import { MongoClient, Db } from 'mongodb';
+import mongoose from 'mongoose';
 
-const uri = process.env.CONNECTION_STRING;
-if (!uri) {
-  throw new Error('La variable d’environnement CONNECTION_STRING est manquante.');
-}
+const uri = process.env.CONNECTION_STRING!;
+let isConnected = false;
 
-const client = new MongoClient(uri);
-
-let clientPromise: Promise<MongoClient> | null = null;
-
-export async function connectToDB(): Promise<MongoClient> {
-  if (!clientPromise) {
-    console.log('🔌 Connexion à MongoDB...');
-    clientPromise = client.connect();
-    await clientPromise;
-    console.log('✅ Connexion MongoDB établie !');
+export async function connectToDB() {
+  if (isConnected) {
+    console.log('✅ MongoDB déjà connecté (Mongoose)');
+    return;
   }
-  return clientPromise;
+
+  try {
+    await mongoose.connect(uri);
+    isConnected = true;
+    console.log('✅ MongoDB connecté avec Mongoose');
+  } catch (error) {
+    console.error('❌ Erreur connexion MongoDB:', error);
+    throw error;
+  }
 }
 
-export function getDbInstance(dbName = "your-db-name"): Db {
-  if (!clientPromise) {
-    throw new Error("DB not connected yet");
-  }
-  return client.db(dbName);
-}
+export default connectToDB;
