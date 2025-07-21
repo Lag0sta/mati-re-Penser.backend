@@ -8,17 +8,18 @@ import uploadsRouter from './routes/uploads';
 
 const app = express();
 
-// CORS dynamique selon l'environnement
-const corsOptions = {
-  origin: 
-  process.env.NODE_ENV === 'production'
-    ? process.env.FRONTEND_URL // ← remplace par ton vrai domaine
-    : 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
-console.log('CORS origin:', corsOptions.origin)
-app.use(cors(corsOptions));
+// // CORS dynamique selon l'environnement
+// const corsOptions = {
+//   origin: 
+//   process.env.NODE_ENV === 'production'
+//     ? process.env.FRONTEND_URL // ← remplace par ton vrai domaine
+//     : 'http://localhost:5173',
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+// };
+// console.log('CORS origin:', corsOptions.origin)
+// app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
 app.get('/', (_req, res) => {
