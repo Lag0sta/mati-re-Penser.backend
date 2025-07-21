@@ -1,8 +1,8 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
+import serverless from 'serverless-http';
 import dotenv from 'dotenv'
 import { MongoClient } from 'mongodb';
 import app from '../src/app'
-import { connectToDatabase } from '../src/models/connection'
 
 dotenv.config()
 
@@ -19,11 +19,12 @@ async function getClient() {
   return clientPromise;
 }
 
+const serverlessHandler = serverless(app);
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     await getClient();
-     res.setHeader('Content-Type', 'application/json');
-    app(req as any, res as any);
+        return serverlessHandler(req, res);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
