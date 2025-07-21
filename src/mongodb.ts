@@ -8,7 +8,6 @@ export async function connectToDB() {
     console.log('✅ MongoDB déjà connecté (Mongoose)');
     return;
   }
-
   try {
     await mongoose.connect(uri);
     isConnected = true;

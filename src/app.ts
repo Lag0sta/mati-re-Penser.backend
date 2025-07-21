@@ -15,15 +15,15 @@ app.use(cors());
 app.use(express.json());
 
 // Connexion MongoDB une fois au démarrage
-app.use(async (req, res, next) => {
+(async () => {
   try {
-    await connectToDB();  // connectToDB doit retourner une Promise réutilisée, pas une nouvelle connexion à chaque fois
-    next();
+    await connectToDB();
+    console.log('MongoDB connecté au démarrage');
   } catch (err) {
-    console.error('❌ Erreur connexion MongoDB :', err);
-    res.status(500).json({ error: 'Erreur MongoDB' });
+    console.error('Erreur connexion MongoDB au démarrage :', err);
+    process.exit(1); // Ou gérer autrement l’erreur critique
   }
-});
+})();
 
 app.get('/', (_req, res) => {
   res.send('Bienvenue sur ton forum 👋');
