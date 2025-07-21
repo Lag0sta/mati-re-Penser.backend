@@ -61,7 +61,6 @@ router.post('/newTopic', async (req, res) => {
 //route pour afficher les topics et le nombre de threads
 router.get('/topicsWithThreadCounts', async (req, res) => {
     try {
-        console.log("Début")
         const topics = await Topic.find();
 
         // Récupère les counts groupés par topic
@@ -102,7 +101,6 @@ router.get('/topicsWithThreadCounts', async (req, res) => {
             threadCount: countMap[topic._id.toString()] || 0,
             lastModified: lastModifiedMap[topic._id.toString()]
         }));
-        console.log("fin")
         res.json(enrichedTopics);
     } catch (error) {
         console.error(error);

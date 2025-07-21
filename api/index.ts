@@ -1,35 +1,30 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
 import dotenv from 'dotenv'
+import { MongoClient } from 'mongodb';
 import app from '../src/app'
 import { connectToDatabase } from '../src/models/connection'
-import serverless from 'serverless-http'
 
 dotenv.config()
 
-// const handler = serverless(app)
 
-export default async function (req: VercelRequest, res: VercelResponse) {
-  console.log('➡️ Requête reçue:', req.method, req.url)
+  const connStr = process.env.CONNECTION_STRING || ''
 
-  const connStr = process.env.CONNECTION_STRING
+  const client = new MongoClient(connStr)
+  let clientPromise: Promise<MongoClient> | null = null;
 
-  if (!connStr) {
-    console.error('❌ CONNECTION_STRING est manquante ou vide')
-    return res.status(500).json({ error: 'CONNECTION_STRING manquante' })
+async function getClient() {
+  if (!clientPromise) {
+    clientPromise = client.connect();
   }
+  return clientPromise;
+}
 
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    await connectToDatabase(connStr)
-    console.log('✅ Connexion DB OK')
+    await getClient();
+     res.setHeader('Content-Type', 'application/json');
+    app(req as any, res as any);
   } catch (error) {
-    console.error('❌ Erreur de connexion à la DB:', error)
-    return res.status(500).json({ error: 'Impossible de se connecter à la base de données' })
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-
-//   try {
-//     return handler(req, res)
-//   } catch (err) {
-//     console.error('❌ Erreur dans handler:', err)
-//     return res.status(500).json({ error: 'Erreur interne' })
-//   }
 }
