@@ -11,7 +11,7 @@ const app = express();
 // CORS dynamique selon l'environnement
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'
-    ? 'https://ton-frontend.vercel.app' // ← remplace par ton vrai domaine
+    ? process.env.FRONTEND_URL // ← remplace par ton vrai domaine
     : 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
