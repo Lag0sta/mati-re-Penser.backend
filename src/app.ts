@@ -10,10 +10,10 @@ const app = express();
 
 // CORS dynamique selon l'environnement
 const corsOptions = {
-  origin: '*',
-  // process.env.NODE_ENV === 'production'
-  //   ? process.env.FRONTEND_URL // ← remplace par ton vrai domaine
-  //   : 'http://localhost:5173',
+  origin: 
+  process.env.NODE_ENV === 'production'
+    ? process.env.FRONTEND_URL // ← remplace par ton vrai domaine
+    : 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
