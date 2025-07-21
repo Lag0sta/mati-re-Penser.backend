@@ -6,7 +6,7 @@ import serverless from 'serverless-http'
 
 dotenv.config()
 
-const handler = serverless(app)
+// const handler = serverless(app)
 
 export default async function (req: VercelRequest, res: VercelResponse) {
   console.log('➡️ Requête reçue:', req.method, req.url)
@@ -26,10 +26,10 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: 'Impossible de se connecter à la base de données' })
   }
 
-  try {
-    return handler(req, res)
-  } catch (err) {
-    console.error('❌ Erreur dans handler:', err)
-    return res.status(500).json({ error: 'Erreur interne' })
-  }
+//   try {
+//     return handler(req, res)
+//   } catch (err) {
+//     console.error('❌ Erreur dans handler:', err)
+//     return res.status(500).json({ error: 'Erreur interne' })
+//   }
 }
