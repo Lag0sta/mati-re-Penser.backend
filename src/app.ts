@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import { connectToDB } from './mongodb';
+
 import authRouter from './routes/auths';
 import userRouter from './routes/users';
 import topicRouter from './routes/topics';
@@ -21,6 +23,17 @@ const app = express();
 // app.use(cors(corsOptions));
 app.use(cors());
 app.use(express.json());
+
+// 👇 Middleware qui connecte à Mongo à chaque requête
+app.use(async (req, res, next) => {
+  try {
+    await connectToDB(); // ne se reconnecte qu’une fois
+    next();
+  } catch (err) {
+    console.error('❌ Erreur connexion MongoDB :', err);
+    res.status(500).json({ error: 'Erreur MongoDB' });
+  }
+});
 
 app.get('/', (_req, res) => {
   res.send('Bienvenue sur ton forum 👋');
