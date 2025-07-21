@@ -10,30 +10,28 @@ import uploadsRouter from './routes/uploads';
 
 const app = express();
 
-// // CORS dynamique selon l'environnement
-// const corsOptions = {
-//   origin: 
-//   process.env.NODE_ENV === 'production'
-//     ? process.env.FRONTEND_URL // ← remplace par ton vrai domaine
-//     : 'http://localhost:5173',
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//   allowedHeaders: ['Content-Type', 'Authorization'],
-// };
-// console.log('CORS origin:', corsOptions.origin)
-// app.use(cors(corsOptions));
+
 app.use(cors());
 app.use(express.json());
 
-// 👇 Middleware qui connecte à Mongo à chaque requête
-app.use(async (req, res, next) => {
+// Connexion MongoDB une fois au démarrage
+async function main() {
   try {
-    await connectToDB(); // ne se reconnecte qu’une fois
-    next();
+    await connectToDB();
+    console.log('MongoDB connecté, démarrage du serveur');
+
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      console.log(`Serveur démarré sur le port ${port}`);
+    });
+
   } catch (err) {
-    console.error('❌ Erreur connexion MongoDB :', err);
-    res.status(500).json({ error: 'Erreur MongoDB' });
+    console.error('Erreur de connexion MongoDB au démarrage :', err);
+    process.exit(1); // Arrêt du process en cas d’erreur critique
   }
-});
+}
+
+main();
 
 app.get('/', (_req, res) => {
   res.send('Bienvenue sur ton forum 👋');
