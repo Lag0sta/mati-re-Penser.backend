@@ -7,22 +7,14 @@ import userRouter from './routes/users';
 import topicRouter from './routes/topics';
 import threadRouter from './routes/threads';
 import uploadsRouter from './routes/uploads';
+import { connect } from 'http2';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// Connexion MongoDB une seule fois au démarrage
-(async () => {
-  try {
-    await connectToDB();
-    console.log('MongoDB connecté au démarrage');
-  } catch (err) {
-    console.error('Erreur connexion MongoDB au démarrage :', err);
-    process.exit(1); // Ou gérer autrement l’erreur critique
-  }
-})();
+
 
 app.get('/', (_req, res) => {
   res.send('Bienvenue sur ton forum 👋');
@@ -31,6 +23,9 @@ app.get('/', (_req, res) => {
 app.get('/test', (_req, res) => {
   res.send('Route test OK');
 });
+
+// Connexion MongoDB une seule fois au démarrage
+connectToDB();
 
 app.use('/auths', authRouter);
 app.use('/users', userRouter);
