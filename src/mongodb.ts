@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 let isConnected = false;
 
 export async function connectToDatabase(uri: string) {
-  if (isConnected) {
+  if (mongoose.connection.readyState === 1) {
     console.log('✅ MongoDB déjà connecté (Mongoose)');
     return;
   }
@@ -12,7 +12,6 @@ export async function connectToDatabase(uri: string) {
   }
   try {
     await mongoose.connect(uri);
-    isConnected = true;
     console.log('✅ MongoDB connecté avec Mongoose');
   } catch (error) {
     console.error('❌ Erreur connexion MongoDB:', error);
