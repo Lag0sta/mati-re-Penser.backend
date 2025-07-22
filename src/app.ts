@@ -10,11 +10,10 @@ import uploadsRouter from './routes/uploads';
 
 const app = express();
 
-
 app.use(cors());
 app.use(express.json());
 
-// Connexion MongoDB une fois au démarrage
+// Connexion MongoDB une seule fois au démarrage
 (async () => {
   try {
     await connectToDB();
@@ -35,9 +34,8 @@ app.get('/test', (_req, res) => {
 
 app.use('/auths', authRouter);
 app.use('/users', userRouter);
-app.use('/topics', topicRouter)
-app.use('/threads', threadRouter)
-app.use('/uploads', uploadsRouter)
-
+app.use('/topics', topicRouter);
+app.use('/threads', threadRouter);
+app.use('/uploads', uploadsRouter);
 
 export default app;
