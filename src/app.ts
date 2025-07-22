@@ -1,13 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-import { connectToDB } from './mongodb';
 
 import authRouter from './routes/auths';
 import userRouter from './routes/users';
 import topicRouter from './routes/topics';
 import threadRouter from './routes/threads';
 import uploadsRouter from './routes/uploads';
-import { connect } from 'http2';
 
 const app = express();
 
@@ -24,8 +22,6 @@ app.get('/test', (_req, res) => {
   res.send('Route test OK');
 });
 
-// Connexion MongoDB une seule fois au démarrage
-connectToDB();
 
 app.use('/auths', authRouter);
 app.use('/users', userRouter);

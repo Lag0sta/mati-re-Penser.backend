@@ -1,13 +1,20 @@
 import dotenv from 'dotenv';
-import app from './app';
-import { connectToDatabase } from './models/connection';
-
 dotenv.config();
 
-const string = process.env.CONNECTION_STRING || '';
+import app from './app';
+import { connectToDatabase } from './mongodb'; // ou './models/connection' selon ton arborescence
 
-connectToDatabase(string).then(() => {
-  app.listen(4000, () => {
-    console.log('🚀 Server running on http://localhost:4000');
-  });
-});
+const uri = process.env.CONNECTION_STRING || '';
+
+const start = async () => {
+  try {
+    await connectToDatabase(uri);  // <-- passer la chaîne ici
+    app.listen(4000, () => {
+      console.log('🚀 Server running on http://localhost:4000');
+    });
+  } catch (error) {
+    console.error('❌ Erreur lors de la connexion à la DB', error);
+  }
+};
+
+start();
