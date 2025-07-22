@@ -5,80 +5,90 @@ const router = Router();
 const bcrypt = require("bcryptjs");
 
 router.get('/', (req, res) => {
+  console.log('➡️ [GET] /users - Récupération des utilisateurs');
   User.find().then((data) => {
-    res.json(data)
-  })
-})
+    console.log(`✅ ${data.length} utilisateurs récupérés`);
+    res.json(data);
+  }).catch(error => {
+    console.error('❌ Erreur lors de la récupération des utilisateurs :', error);
+    res.status(500).json({ result: false, error: 'Erreur serveur' });
+  });
+});
 
-//Création d'un nouvel utilisateur
+// Création d'un nouvel utilisateur
 router.post('/signup', async (req, res) => {
   try {
-    const { pseudo, email, password, confirmPassword,name, surname } = req.body;
-    //verification champs vides
+    const { pseudo, email, password, confirmPassword, name, surname } = req.body;
+    console.log('➡️ [POST] /signup - Tentative de création de compte');
+
     if (!pseudo || !email || !password || !name || !surname) {
+      console.warn('⚠️ Champs manquants');
       res.json({ result: false, error: 'remplissez les champs' });
       return;
     }
 
-    // Vérification si le compte existe déjà
     const userData = await User.findOne({
       $or: [{ pseudo: pseudo }, { email: email }],
     });
     if (userData) {
+      console.warn("⚠️ Utilisateur ou email déjà existant");
       res.json({ result: false, error: "nom d'utilisateur ou  @mail déja utilisé" });
       return;
     }
 
-    // Vérification de l'adresse email
     const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gi;
     if (!emailRegex.test(email)) {
+      console.warn('⚠️ Email invalide');
       res.json({ result: false, error: "adresse @mail invalide" });
       return;
     }
 
-    //vérifications que les mots de passe correspondent
     if (password !== confirmPassword) {
-        res.json({ result: false, error: "Les mots de passe ne correspondent pas"});
-
-        return
+      console.warn('⚠️ Mots de passe non correspondants');
+      res.json({ result: false, error: "Les mots de passe ne correspondent pas" });
+      return;
     }
 
-    // Hashage du mot de passe
     const hash = bcrypt.hashSync(password, 10);
+    console.log('🔐 Mot de passe hashé');
 
-    // Création d'un nouvel utilisateur
     const newUser = new User({
-      pseudo: pseudo,
-      name: name,
-      surname: surname,
-      email: email,
+      pseudo,
+      name,
+      surname,
+      email,
       password: hash,
     });
 
-    // Sauvegarde de l'utilisateur
     await newUser.save();
+    console.log(`✅ Nouvel utilisateur créé : ${newUser.pseudo}`);
+
     res.json({
       result: true,
       success: 'utilisateur créé avec succès',
       pseudo: newUser.pseudo,
     });
 
-  }
-  catch (error) {
+  } catch (error) {
+    console.error("❌ Erreur lors de l'enregistrement de l'utilisateur :", error);
     res.json({ result: false, error: "erreur en sauvegarde de l'utilisateur" });
   }
 });
 
-//route pour modifier l'avatar
+// Route pour modifier l'avatar
 router.put('/avatar', async (req, res) => {
   try {
     const { avatar, token } = req.body;
+    console.log('➡️ [PUT] /avatar - Modification de l\'avatar');
+
     if (!token) {
+      console.warn('⚠️ Token manquant');
       res.status(401).json({ result: false, error: 'connectez-vous' });
-      return
+      return;
     }
 
     if (!avatar) {
+      console.warn('⚠️ Avatar non fourni');
       res.json({ result: false, error: 'choisissez un avatar' });
       return;
     }
@@ -86,19 +96,21 @@ router.put('/avatar', async (req, res) => {
     const user = await User.findOneAndUpdate({ accessToken: token },
       { avatar: avatar },
       { new: true }
-    )
+    );
 
     if (!user) {
+      console.warn('⚠️ Utilisateur non trouvé');
       res.status(404).json({ result: false, error: 'Utilisateur non trouvé' });
-      return
+      return;
     }
 
+    console.log(`✅ Avatar mis à jour pour ${user.pseudo}`);
     res.json({ result: true, success: 'avatar modifié', avatar: user.avatar });
 
-  }
-  catch (error) {
-    console.error(error);
+  } catch (error) {
+    console.error('❌ Erreur lors de la mise à jour de l\'avatar :', error);
     res.json({ result: false, error: 'erreur lors de la connection' });
   }
-})
+});
+
 export default router;
