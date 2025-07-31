@@ -56,11 +56,11 @@ router.post('/newTopic', async (req, res) => {
 
         await newTopic.save();
         console.log(`✅ Nouveau sujet créé: ${title}`);
-        res.json({ result: true, newTopic });
+        res.json({ result: true, newTopic, success: `✅ Nouveau sujet créé: ${title}` });
 
     } catch (error) {
         console.error('❌ Erreur serveur lors de la création d’un sujet:', error);
-        res.status(500).json({ result: false, message: 'Erreur de Serveur' });
+        res.status(500).json({ result: false, error: 'Erreur de Serveur' });
     }
 });
 
@@ -85,17 +85,17 @@ router.get('/topicsWithThreadCounts', async (req, res) => {
             countMap[tc._id.toString()] = tc.count;
         });
 
-        const enrichedTopics = topics.map(topic => ({
+        const threadsInTopic = topics.map(topic => ({
             ...topic.toObject(),
             threadCount: countMap[topic._id.toString()] || 0,
             lastModified: lastModifiedMap[topic._id.toString()]
         }));
 
-        console.log(`✅ ${enrichedTopics.length} sujets enrichis retournés`);
-        res.json(enrichedTopics);
+        console.log(`✅ ${threadsInTopic.length} commentaires retournés`);
+        res.json({threadsInTopic, success:`✅ ${threadsInTopic.length} sujets trouvés`});
     } catch (error) {
         console.error('❌ Erreur serveur:', error);
-        res.status(500).json({ result: false, message: 'Erreur de serveur' });
+        res.status(500).json({ result: false, error: 'Erreur de serveur' });
     }
 });
 
@@ -142,10 +142,10 @@ router.post('/topicContent', async (req, res) => {
             })),
         };
 
-        res.json({ result: true, discussion });
+        res.json({ result: true, discussion, success: `✅ discussion ${discussion.title} créé` });
     } catch (error) {
         console.error('❌ Erreur serveur lors de /topicContent:', error);
-        res.status(500).json({ result: false, message: 'Erreur de serveur' });
+        res.status(500).json({ result: false, error: 'Erreur de serveur' });
     }
 });
 
@@ -179,7 +179,7 @@ router.put("/editTopic", async (req, res) => {
 
     } catch (error) {
         console.error('❌ Erreur serveur lors de /editTopic:', error);
-        res.status(500).json({ result: false, message: 'Erreur de serveur' });
+        res.status(500).json({ result: false, error: 'Erreur de serveur' });
     }
 });
 
@@ -206,7 +206,7 @@ router.put("/lockTopic", async (req, res) => {
         res.json({ result: true, success: "Sujet vérouillé", isLocked: lockTopic.isLocked });
     } catch (error) {
         console.error('❌ Erreur serveur lors de /lockTopic:', error);
-        res.status(500).json({ result: false, message: 'Erreur de serveur' });
+        res.status(500).json({ result: false, error: 'Erreur de serveur' });
     }
 });
 

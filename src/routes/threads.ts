@@ -58,13 +58,13 @@ router.post('/newComment', async (req, res) => {
 
         res.json({
             result: true,
-            successZ: 'commentaire ajouté',
+            success: 'commentaire ajouté',
             newThread,
         });
 
     } catch (error) {
         console.error('🔥 Erreur serveur /newComment:', error);
-        res.status(500).json({ result: false, message: 'Server error' });
+        res.status(500).json({ result: false, error: 'Server error' });
     }
 });
 
