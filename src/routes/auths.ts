@@ -2,6 +2,8 @@
 import { Router } from 'express';
 import User from '../models/users';
 
+import { checkToken } from '../utils/authActions';
+
 const router = Router();
 const bcrypt = require("bcryptjs");
 const uid2 = require('uid2');
@@ -71,25 +73,20 @@ router.post('/auth', async (req, res) => {
         const { token, password } = req.body;
         console.log('📨 Token reçu:', token ? 'oui' : 'non');
 
-        if (!token) {
-            console.warn('⚠️ Aucun token');
-            res.status(401).json({ result: false, error: 'Veuillez vous connecter' });
-            return;
-        }
-
         if (!password) {
             console.warn('⚠️ Mot de passe manquant');
             res.status(400).json({ result: false, error: 'Veuillez remplir tous les champs' });
             return;
         }
 
-        const user = await User.findOne({ accessToken: token });
-
-        if (!user) {
-            console.warn('❌ Token invalide ou utilisateur introuvable');
-            res.status(404).json({ result: false, error: 'Utilisateur introuvable' });
-            return;
-        }
+        const authResponse = await checkToken({ token });
+        
+                if (!authResponse.result || !authResponse.user) {
+                    res.json({result : false, error : authResponse.error});
+                    return;
+                }
+        
+                const user = authResponse.user
 
         const isMatch = await bcrypt.compare(password, user?.password);
         if (!isMatch) {

@@ -6,6 +6,7 @@ const topicsSchema = new mongoose.Schema({
     isLocked: Boolean,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
     creationDate: Date,
+    modificationDate: Date,
 })
 
 const Topic = mongoose.model('topics', topicsSchema);

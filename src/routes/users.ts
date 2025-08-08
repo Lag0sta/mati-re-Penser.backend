@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import User from '../models/users';
 
+import { checkToken } from '../utils/authActions';
+
 const router = Router();
 const bcrypt = require("bcryptjs");
 
@@ -81,12 +83,13 @@ router.put('/avatar', async (req, res) => {
     const { avatar, token } = req.body;
     console.log('➡️ [PUT] /avatar - Modification de l\'avatar');
 
-    if (!token) {
-      console.warn('⚠️ Token manquant');
-      res.status(401).json({ result: false, error: 'connectez-vous' });
-      return;
-    }
-
+    const authResponse = await checkToken({ token });
+    
+            if (!authResponse.result || !authResponse.user) {
+                res.json({result : false, error : authResponse.error});
+                return;
+            }
+    
     if (!avatar) {
       console.warn('⚠️ Avatar non fourni');
       res.json({ result: false, error: 'choisissez un avatar' });

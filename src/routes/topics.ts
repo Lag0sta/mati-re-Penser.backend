@@ -2,6 +2,10 @@ import { Router } from 'express';
 import Topic from '../models/topics';
 import Thread from '../models/threads';
 import User from '../models/users';
+import Comment from '../models/comments';
+
+import { checkToken } from '../utils/authActions';
+import { error } from 'console';
 
 const router = Router();
 
@@ -18,19 +22,14 @@ router.post('/newTopic', async (req, res) => {
     try {
         const { token, title, description } = req.body;
 
-        if (!token) {
-            console.warn('❌ Token manquant');
-            res.json({ result: false, error: 'veuillez vous connecter' });
+        const authResponse = await checkToken({ token });
+
+        if (!authResponse.result || !authResponse.user) {
+            res.json({result : false, error : authResponse.error});
             return;
         }
 
-        const user = await User.findOne({ accessToken: token });
-
-        if (!user) {
-            console.warn('❌ Utilisateur non trouvé');
-            res.json({ result: false, error: "l'utilisateur n'a pas été trouvé" });
-            return;
-        }
+        const user = authResponse.user
 
         if (!title || !description) {
             console.warn('❌ Champs vides');
@@ -92,7 +91,7 @@ router.get('/topicsWithThreadCounts', async (req, res) => {
         }));
 
         console.log(`✅ ${threadsInTopic.length} commentaires retournés`);
-        res.json({threadsInTopic, success:`✅ ${threadsInTopic.length} sujets trouvés`});
+        res.json({ threadsInTopic, success: `✅ ${threadsInTopic.length} sujets trouvés` });
     } catch (error) {
         console.error('❌ Erreur serveur:', error);
         res.status(500).json({ result: false, error: 'Erreur de serveur' });
@@ -114,19 +113,53 @@ router.post('/topicContent', async (req, res) => {
             return;
         }
 
-        const threads = await Thread.find({ topic: topic._id }).populate({
-            path: 'createdBy',
-            select: 'pseudo avatar'
-        });
+        const threads = await Thread.find({ topic: topic._id })
+            .populate({ path: 'createdBy', select: 'pseudo avatar ' })
 
         if (!threads) {
             console.warn('❌ Discussions non trouvées');
             res.json({ result: false, error: 'discussion non trouvé' });
             return;
         }
+        console.log('➡️ threads', threads)
 
-        console.log(`✅ ${threads.length} threads trouvés pour le sujet "${title}"`);
+        const comments = await Comment.find({ thread: { $in: threads.map(thread => thread._id) } })
+            .populate({ path: 'createdBy', select: 'pseudo avatar ' });
 
+        console.log("➡️ comments :", comments);
+
+        if (comments.length === 0) {
+            console.warn('❌ Commentaires non trouvées');
+            res.json({ result: false, error: 'commentaires non trouvées' });
+            return;
+        }
+
+        // Regrouper les commentaires par threadId
+        interface CommentData {
+            id: string;
+            text?: string | null;
+            createdBy?: any;
+            creationDate?: Date | null;
+        }
+
+        const commentsByThread: Record<string, CommentData[]> = {};
+
+        //fait le tour de [comments]
+        comments.forEach(comment => {
+            if (comment.thread !== null && comment.thread !== undefined) {
+                const threadId = comment.thread.toString();
+                if (!commentsByThread[threadId]) {
+                    commentsByThread[threadId] = []
+                }
+
+                commentsByThread[threadId].push({
+                    id: comment._id.toString(),
+                    text: comment.text,
+                    createdBy: comment.createdBy,
+                    creationDate: comment.creationDate,
+                });
+            }
+        });
         const discussion = {
             id: topic._id,
             title: topic.title,
@@ -139,10 +172,11 @@ router.post('/topicContent', async (req, res) => {
                 text: thread.text,
                 createdBy: thread.createdBy,
                 creationDate: thread.creationDate,
+                comments: commentsByThread[thread._id.toString()] || [] //va récupérer les {commentaires} push à partir de chaque thread._id précédement
             })),
         };
 
-        res.json({ result: true, discussion, success: `✅ discussion ${discussion.title} créé` });
+        res.json({ result: true, discussion, success: `✅ discussion "${discussion.title}" récupérée` });
     } catch (error) {
         console.error('❌ Erreur serveur lors de /topicContent:', error);
         res.status(500).json({ result: false, error: 'Erreur de serveur' });
@@ -154,9 +188,10 @@ router.put("/editTopic", async (req, res) => {
     try {
         const { token, title, description, id } = req.body;
 
-        if (!token) {
-            console.warn('❌ Token manquant');
-            res.json({ result: false, error: 'veuillez vous connecter' });
+        const authResponse = await checkToken({ token });
+
+        if (!authResponse.result || !authResponse.user) {
+            res.json({result : false, error : authResponse.error});
             return;
         }
 

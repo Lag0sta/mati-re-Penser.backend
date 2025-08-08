@@ -13,7 +13,6 @@ app.use(cors());
 app.use(express.json());
 
 
-
 app.get('/', (_req, res) => {
   res.send('Bienvenue sur ton forum 👋');
 });
@@ -21,7 +20,6 @@ app.get('/', (_req, res) => {
 app.get('/test', (_req, res) => {
   res.send('Route test OK');
 });
-
 
 app.use('/auths', authRouter);
 app.use('/users', userRouter);

@@ -2,6 +2,9 @@ import { Router } from 'express';
 import Topic from '../models/topics';
 import Thread from '../models/threads';
 import User from '../models/users';
+import Comment from '../models/comments';
+
+import { checkToken } from '../utils/authActions';
 
 const router = Router();
 
@@ -12,18 +15,15 @@ router.post('/newComment', async (req, res) => {
         const { token, title, text } = req.body;
         console.log('📨 Données reçues:', { tokenPresent: !!token, title, textPresent: !!text });
 
-        if (!token) {
-            console.warn('⚠️ Token manquant');
-            res.json({ result: false, error: 'connectez-vous' });
+        const authResponse = await checkToken({ token });
+
+        if (!authResponse.result || !authResponse.user) {
+            res.json({ result: false, error: authResponse.error });
             return;
         }
 
-        const user = await User.findOne({ accessToken: token });
-        if (!user) {
-            console.warn('❌ Utilisateur non trouvé pour ce token');
-            res.json({ result: false, error: 'utilisateur non trouvé' });
-            return;
-        }
+        const user = authResponse.user
+
         console.log(`👤 Utilisateur identifié: ${user.pseudo} (${user.email})`);
 
         if (!text) {
@@ -45,6 +45,7 @@ router.post('/newComment', async (req, res) => {
             text: text,
             createdBy: user._id,
             creationDate: new Date(),
+            modificationDate: new Date(),
         });
 
         const savedThread = await newThread.save();
@@ -68,5 +69,65 @@ router.post('/newComment', async (req, res) => {
     }
 });
 
+router.post('/newResponse', async (req, res) => {
+    console.log('➡️ [POST] /newResponse');
+
+    try {
+        const { token, text, threadId } = req.body;
+        console.log('📨 Données reçues:', { tokenPresent: !!token, threadId, textPresent: !!text });
+
+        const authResponse = await checkToken({ token });
+
+        if (!authResponse.result || !authResponse.user) {
+            res.json({result : false, error : authResponse.error});
+            return;
+        }
+
+        const user = authResponse.user
+        
+        console.log(`👤 Utilisateur identifié: ${user.pseudo} (${user.email})`);
+
+        if (!text) {
+            console.warn('⚠️ Champ texte vide');
+            res.json({ result: false, error: 'remplissez les champs' });
+            return;
+        }
+
+        const thread = await Thread.findOne({ _id: threadId });
+        if (!thread) {
+            console.warn(`❌ commentaire "${text}" non trouvé`);
+            res.json({ result: false, error: 'Sujet non trouvé' });
+            return;
+        }
+        console.log(`📌 commentaire trouvé: ${thread.text} (ID: ${thread._id})`);
+
+        const newComment = new Comment({
+            thread: thread._id,
+            text: text,
+            createdBy: user._id,
+            creationDate: new Date(),
+            modificationDate: new Date(),
+        });
+
+        const savedThread = await newComment.save();
+        console.log('📝 Commentaire sauvegardé (ID):', savedThread._id);
+
+        await savedThread.populate({
+            path: 'createdBy',
+            select: 'avatar',
+        });
+        console.log('🎨 Données utilisateur peuplées pour le commentaire');
+
+        res.json({
+            result: true,
+            success: 'commentaire ajouté',
+            newComment,
+        });
+
+    } catch (error) {
+        console.error('🔥 Erreur serveur /newComment:', error);
+        res.status(500).json({ result: false, error: 'Server error' });
+    }
+});
 
 export default router;
