@@ -84,7 +84,7 @@ router.post('/newResponse', async (req, res) => {
         }
 
         const user = authResponse.user
-        
+
         console.log(`👤 Utilisateur identifié: ${user.pseudo} (${user.email})`);
 
         if (!text) {
@@ -93,16 +93,16 @@ router.post('/newResponse', async (req, res) => {
             return;
         }
 
-        const thread = await Thread.findOne({ _id: threadId });
-        if (!thread) {
-            console.warn(`❌ commentaire "${text}" non trouvé`);
-            res.json({ result: false, error: 'Sujet non trouvé' });
-            return;
-        }
-        console.log(`📌 commentaire trouvé: ${thread.text} (ID: ${thread._id})`);
+        // const thread = await Thread.findOne({ _id: threadId });
+        // if (!thread) {
+        //     console.warn(`❌ commentaire "${text}" non trouvé`);
+        //     res.json({ result: false, error: 'Sujet non trouvé' });
+        //     return;
+        // }
+        // console.log(`📌 commentaire trouvé: ${thread.text} (ID: ${thread._id})`);
 
         const newComment = new Comment({
-            thread: thread._id,
+            thread: threadId,
             text: text,
             createdBy: user._id,
             creationDate: new Date(),
