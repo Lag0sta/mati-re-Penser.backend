@@ -18,7 +18,7 @@ router.post('/signin', async (req, res) => {
 
         if (!email || !password) {
             console.warn('⚠️ Champs manquants');
-            res.json({ result: false, error: 'remplissez les champs' });
+            res.json({ result: false, message: 'remplissez les champs' });
             return;
         }
 
@@ -29,7 +29,7 @@ router.post('/signin', async (req, res) => {
 
         if (!userData || !bcrypt.compareSync(password, userData.password)) {
             console.warn('❌ Identifiants incorrects');
-            res.json({ result: false, error: "mauvais identifiants" });
+            res.json({ result: false, message: "mauvais identifiants" });
             return;
         }
 
@@ -42,7 +42,7 @@ router.post('/signin', async (req, res) => {
 
         if (!updatedUser) {
             console.error('❌ Mise à jour accessToken échouée');
-            res.json({ result: false, error: "utilisateur non trouvé" });
+            res.json({ result: false, message: "utilisateur non trouvé" });
             return;
         }
 
@@ -60,7 +60,7 @@ router.post('/signin', async (req, res) => {
 
     } catch (error) {
         console.error('🔥 Erreur interne /signin:', error);
-        res.json({ result: false, error: 'erreur de connection' });
+        res.json({ result: false, message: 'erreur de connection' });
     }
 });
 
@@ -76,14 +76,14 @@ router.post('/auth', async (req, res) => {
 
         if (!password) {
             console.warn('⚠️ Mot de passe manquant');
-            res.status(400).json({ result: false, error: 'Veuillez remplir tous les champs' });
+            res.status(400).json({ result: false, message: 'Veuillez remplir tous les champs' });
             return;
         }
 
         const authResponse = await checkToken({ token });
 
         if (!authResponse.result || !authResponse.user) {
-            res.json({ result: false, error: authResponse.error });
+            res.json({ result: false, message: authResponse.error });
             return;
         }
 
@@ -92,16 +92,16 @@ router.post('/auth', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user?.password);
         if (!isMatch) {
             console.warn(`❌ Mot de passe incorrect pour ${user.email}`);
-            res.status(401).json({ result: false, error: 'Mot de passe incorrect' });
+            res.status(401).json({ result: false, message: 'Mot de passe incorrect' });
             return;
         }
 
         console.log(`✅ Authentification réussie pour ${user.email}`);
-        res.json({ result: true, success: 'Authentification réussie' });
+        res.json({ result: true, message: 'Authentification réussie' });
 
     } catch (error) {
         console.error('🔥 Erreur interne /auth:', error);
-        res.json({ result: false, error: 'Erreur interne du serveur' });
+        res.json({ result: false, message: 'Erreur interne du serveur' });
     }
 });
 
