@@ -10,7 +10,7 @@ const usersSchema = new mongoose.Schema({
     accessToken: String,
     submits:[],
     resetPasswordToken: String,
-    resetPasswordExpires: Date
+    resetPasswordExpires: Date,
 })
 
 const User = mongoose.model('users', usersSchema);

@@ -80,13 +80,13 @@ router.post('/auth', async (req, res) => {
         }
 
         const authResponse = await checkToken({ token });
-        
-                if (!authResponse.result || !authResponse.user) {
-                    res.json({result : false, error : authResponse.error});
-                    return;
-                }
-        
-                const user = authResponse.user
+
+        if (!authResponse.result || !authResponse.user) {
+            res.json({ result: false, error: authResponse.error });
+            return;
+        }
+
+        const user = authResponse.user
 
         const isMatch = await bcrypt.compare(password, user?.password);
         if (!isMatch) {
@@ -104,5 +104,22 @@ router.post('/auth', async (req, res) => {
     }
 });
 
+router.put('/logout', async (req, res) => {
+    console.log('➡️ [PUT] /logout');
+    const { token, id } = req.body
+    try {
+        const logOut = await User.findOneAndUpdate({ _id: id, accessToken: token }, { accessToken: "" }, { new: true });
+        res.json({ result: true, success: "Deconnexion reussie" });
+
+        if (!logOut) {
+            res.json({ result: false, error: "Utilisateur non trouvé ou déjà déconnecté" });
+            return
+        }
+
+    } catch (error) {
+        console.error('🔥 Erreur interne /logout:', error);
+        res.json({ result: false, error: 'Erreur interne du serveur' });
+    }
+})
 
 export default router;

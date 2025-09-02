@@ -47,10 +47,11 @@ router.post('/signup', signupLimiter, async (req, res) => {
     const { pseudo, email, password, confirmPassword, name, surname, hp } = req.body;
     console.log('➡️ [POST] /signup - Tentative de création de compte');
 
+    //vérification de bot
     if (hp && hp.trim() !== "") {
      res.json({ success: false, reason: "Bot détecté" });
      return
-  }
+    }
 
     if (!pseudo || !email || !password || !name || !surname) {
       console.warn('⚠️ Champs manquants');
@@ -72,6 +73,7 @@ router.post('/signup', signupLimiter, async (req, res) => {
       return
     }
 
+    //vérification de doublons
     const userData = await User.findOne({
       $or: [{ pseudo: pseudo }, { email: email }],
     });
@@ -80,15 +82,15 @@ router.post('/signup', signupLimiter, async (req, res) => {
       res.json({ result: false, error: "nom d'utilisateur ou  @mail déja utilisé" });
       return;
     }
-
     
-
+    //vérification du mot-de-passe
     if (password !== confirmPassword) {
       console.warn('⚠️ Mots de passe non correspondants');
       res.json({ result: false, error: "Les mots de passe ne correspondent pas" });
       return;
     }
 
+    //sécurisation du mot-de-passe
     const hash = bcrypt.hashSync(password, 10);
     console.log('🔐 Mot de passe hashé');
 
