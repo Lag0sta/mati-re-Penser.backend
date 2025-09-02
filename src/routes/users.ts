@@ -20,8 +20,13 @@ router.get('/', (req, res) => {
 // Création d'un nouvel utilisateur
 router.post('/signup', async (req, res) => {
   try {
-    const { pseudo, email, password, confirmPassword, name, surname } = req.body;
+    const { pseudo, email, password, confirmPassword, name, surname, hp } = req.body;
     console.log('➡️ [POST] /signup - Tentative de création de compte');
+
+    if (hp && hp.trim() !== "") {
+     res.json({ success: false, reason: "Bot détecté" });
+     return
+  }
 
     if (!pseudo || !email || !password || !name || !surname) {
       console.warn('⚠️ Champs manquants');

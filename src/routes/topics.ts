@@ -128,12 +128,6 @@ router.post('/topicContent', async (req, res) => {
 
         console.log("➡️ comments :", comments);
 
-        // if (comments.length === 0) {
-        //     console.warn('❌ Commentaires non trouvées');
-        //     res.json({ result: false, error: 'commentaires non trouvées' });
-        //     return;
-        // }
-
         // Regrouper les commentaires par threadId
         interface CommentData {
             id: string;

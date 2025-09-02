@@ -69,6 +69,54 @@ router.post('/newComment', async (req, res) => {
     }
 });
 
+router.put('editComment', async (req, res) => {
+        const { token, text, id } = req.body
+        console.log('➡️ [PUT] /editResponse');
+
+        const authResponse = await checkToken({ token });
+
+        if (!authResponse.result) {
+                res.json({result : false, error : authResponse.error});
+                return;
+            }
+
+        const editComment = await Thread.findOneAndUpdate({ _id: id }, { text }, { new: true });
+
+        if (!editComment) {
+            console.warn('❌ Commentaire non trouvé');
+            res.json({ result: false, error: 'Commentaire non trouvé' });
+            return;
+        }
+
+        console.log(`✅ Commentaire modifié`);
+        res.json({ result: true, success: 'Commentaire mis à jour', editComment });
+
+    });
+
+    router.delete('/deleteComment', async (req, res) => {
+        const { token, id } = req.body
+        console.log('➡️ [DELETE] /deleteComment');
+
+        const authResponse = await checkToken({ token });
+
+        if (!authResponse.result) {
+                res.json({result : false, error : authResponse.error});
+                return;
+            }
+
+        const deleteComment = await Thread.findOneAndDelete({ _id: id });
+
+        if (!deleteComment) {
+            console.warn('❌ Commentaire non rencontré');
+            res.json({ result: false, error: 'Commentaire non rencontré' });
+            return;
+        }
+
+        console.log(`✅ Commentaire supprimé`);
+        res.json({ result: true, success: 'Commentaire supprimé' });
+
+    })
+
     router.post('/newResponse', async (req, res) => {
         console.log('➡️ [POST] /newResponse');
 
@@ -115,11 +163,60 @@ router.post('/newComment', async (req, res) => {
                 success: 'commentaire ajouté',
                 newComment,
             });
-
+ 
         } catch (error) {
             console.error('🔥 Erreur serveur /newComment:', error);
             res.status(500).json({ result: false, error: 'Server error' });
         }
     });
+
+
+    router.put('editResponse', async (req, res) => {
+        const { token, text, id } = req.body
+        console.log('➡️ [PUT] /editResponse');
+
+        const authResponse = await checkToken({ token });
+
+        if (!authResponse.result) {
+                res.json({result : false, error : authResponse.error});
+                return;
+            }
+
+        const editResponse = await Comment.findOneAndUpdate({ _id: id }, { text }, { new: true });
+
+        if (!editResponse) {
+            console.warn('❌ Commentaire non trouvé');
+            res.json({ result: false, error: 'Commentaire non trouvé' });
+            return;
+        }
+
+        console.log(`✅ Commentaire modifié`);
+        res.json({ result: true, success: 'Commentaire mis à jour', editResponse });
+
+    });
+
+     router.delete('/deleteResponse', async (req, res) => {
+        const { token, id } = req.body
+        console.log('➡️ [DELETE] /deleteResponse');
+
+        const authResponse = await checkToken({ token });
+
+        if (!authResponse.result) {
+                res.json({result : false, error : authResponse.error});
+                return;
+            }
+
+        const deleteResponse = await Thread.findOneAndDelete({ _id: id });
+
+        if (!deleteResponse) {
+            console.warn('❌ Commentaire non rencontré');
+            res.json({ result: false, error: 'Commentaire non rencontré' });
+            return;
+        }
+
+        console.log(`✅ Commentaire supprimé`);
+        res.json({ result: true, success: 'Commentaire supprimé' });
+
+    })
 
 export default router;
