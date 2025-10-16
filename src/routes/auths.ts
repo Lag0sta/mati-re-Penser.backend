@@ -46,7 +46,7 @@ router.post('/signin', async (req, res) => {
 
         res.json({
             result: true,
-            success: `Bonjour ${updatedUser.pseudo}`,
+            message: `Bonjour ${updatedUser.pseudo}`,
             id: updatedUser.id,
             avatar: updatedUser.avatar,
             pseudo: updatedUser.pseudo,
