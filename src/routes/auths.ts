@@ -23,12 +23,8 @@ router.post('/signin', async (req, res) => {
         }
 
         const userData = await User.findOne({ email: email });
-        if (!userData) {
-            console.warn('❌ Utilisateur non trouvé');
-        }
 
         if (!userData || !bcrypt.compareSync(password, userData.password)) {
-            console.warn('❌ Identifiants incorrects');
             res.json({ result: false, message: "mauvais identifiants" });
             return;
         }
