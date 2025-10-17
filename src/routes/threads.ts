@@ -12,7 +12,7 @@ router.post('/newComment', async (req, res) => {
     console.log('➡️ [POST] /newComment');
 
     try {
-        const { token, title, text, replyTo } = req.body;
+        const { token, title, text, replyTo, replyToUser } = req.body;
         console.log('📨 Données reçues:', { tokenPresent: !!token, title, textPresent: !!text });
 
         const authResponse = await checkToken({ token });
@@ -43,6 +43,7 @@ router.post('/newComment', async (req, res) => {
         const newThread = new Thread({
             topic: topic._id,
             replyTo : replyTo ? replyTo : "",
+            replyToUser: replyToUser ? replyToUser : "",
             text: text,
             createdBy: user._id,
             creationDate: new Date(),
