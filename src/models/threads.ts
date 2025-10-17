@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const threadsSchema = new mongoose.Schema({
     topic: { type: mongoose.Schema.Types.ObjectId, ref: 'topics' },
+    replyTo: String,
     text: String,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'users' },
     creationDate: Date,
