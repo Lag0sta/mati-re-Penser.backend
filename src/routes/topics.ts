@@ -164,6 +164,7 @@ router.post('/topicContent', async (req, res) => {
             topicThread: threads.map(thread => ({
                 id: thread._id,
                 replyTo: thread.replyTo,
+                replyToUser: thread.replyToUser,
                 text: thread.text,
                 createdBy: thread.createdBy,
                 creationDate: thread.creationDate,
