@@ -128,32 +128,32 @@ router.post('/topicContent', async (req, res) => {
 
         console.log("➡️ comments :", comments);
 
-        // Regrouper les commentaires par threadId
-        interface CommentData {
-            id: string;
-            text?: string | null;
-            createdBy?: any;
-            creationDate?: Date | null;
-        }
+        // // Regrouper les commentaires par threadId
+        // interface CommentData {
+        //     id: string;
+        //     text?: string | null;
+        //     createdBy?: any;
+        //     creationDate?: Date | null;
+        // }
 
-        const commentsByThread: Record<string, CommentData[]> = {};
+        // const commentsByThread: Record<string, CommentData[]> = {};
 
-        //fait le tour de [comments]
-        comments.forEach(comment => {
-            if (comment.thread !== null && comment.thread !== undefined) {
-                const threadId = comment.thread.toString();
-                if (!commentsByThread[threadId]) {
-                    commentsByThread[threadId] = []
-                }
+        // //fait le tour de [comments]
+        // comments.forEach(comment => {
+        //     if (comment.thread !== null && comment.thread !== undefined) {
+        //         const threadId = comment.thread.toString();
+        //         if (!commentsByThread[threadId]) {
+        //             commentsByThread[threadId] = []
+        //         }
 
-                commentsByThread[threadId].push({
-                    id: comment._id.toString(),
-                    text: comment.text,
-                    createdBy: comment.createdBy,
-                    creationDate: comment.creationDate,
-                });
-            }
-        });
+        //         commentsByThread[threadId].push({
+        //             id: comment._id.toString(),
+        //             text: comment.text,
+        //             createdBy: comment.createdBy,
+        //             creationDate: comment.creationDate,
+        //         });
+        //     }
+        // });
         const discussion = {
             id: topic._id,
             title: topic.title,
@@ -163,10 +163,11 @@ router.post('/topicContent', async (req, res) => {
             creationDate: topic.creationDate,
             topicThread: threads.map(thread => ({
                 id: thread._id,
+                replyTo: thread.replyTo,
                 text: thread.text,
                 createdBy: thread.createdBy,
                 creationDate: thread.creationDate,
-                comments: commentsByThread[thread._id.toString()] || [] //va récupérer les {commentaires} push à partir de chaque thread._id précédement
+                // comments: commentsByThread[thread._id.toString()] || [] //va récupérer les {commentaires} push à partir de chaque thread._id précédement
             })),
         };
 
