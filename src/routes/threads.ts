@@ -69,7 +69,7 @@ router.post('/newComment', async (req, res) => {
     }
 });
 
-router.put('editComment', async (req, res) => {
+router.put('/editComment', async (req, res) => {
         const { token, text, id } = req.body
         console.log('➡️ [PUT] /editResponse');
 
