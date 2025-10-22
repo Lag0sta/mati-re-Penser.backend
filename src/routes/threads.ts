@@ -76,7 +76,7 @@ router.put('/editComment', async (req, res) => {
         const authResponse = await checkToken({ token });
 
         if (!authResponse.result) {
-                res.json({result : false, error : authResponse.error});
+                res.json({result : false, message : authResponse.error});
                 return;
             }
 
@@ -84,12 +84,12 @@ router.put('/editComment', async (req, res) => {
 
         if (!editComment) {
             console.warn('❌ Commentaire non trouvé');
-            res.json({ result: false, error: 'Commentaire non trouvé' });
+            res.json({ result: false, message: 'Commentaire non trouvé' });
             return;
         }
 
         console.log(`✅ Commentaire modifié`);
-        res.json({ result: true, success: 'Commentaire mis à jour', editComment });
+        res.json({ result: true, message: 'Commentaire mis à jour', editComment });
 
     });
 
@@ -100,7 +100,7 @@ router.put('/editComment', async (req, res) => {
         const authResponse = await checkToken({ token });
 
         if (!authResponse.result) {
-                res.json({result : false, error : authResponse.error});
+                res.json({result : false, message : authResponse.error});
                 return;
             }
 
@@ -108,12 +108,12 @@ router.put('/editComment', async (req, res) => {
 
         if (!deleteComment) {
             console.warn('❌ Commentaire non rencontré');
-            res.json({ result: false, error: 'Commentaire non rencontré' });
+            res.json({ result: false, message: 'Commentaire non rencontré' });
             return;
         }
 
         console.log(`✅ Commentaire supprimé`);
-        res.json({ result: true, success: 'Commentaire supprimé' });
+        res.json({ result: true, message: 'Commentaire supprimé' });
 
     })
 
