@@ -72,7 +72,7 @@ router.post('/auth', async (req, res) => {
 
         if (!password) {
             console.warn('⚠️ Mot de passe manquant');
-            res.status(400).json({ result: false, message: 'Veuillez remplir tous les champs' });
+            res.json({ result: false, message: 'Veuillez remplir tous les champs' });
             return;
         }
 
@@ -88,7 +88,7 @@ router.post('/auth', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user?.password);
         if (!isMatch) {
             console.warn(`❌ Mot de passe incorrect pour ${user.email}`);
-            res.status(401).json({ result: false, message: 'Mot de passe incorrect' });
+            res.json({ result: false, message: 'Mot de passe incorrect' });
             return;
         }
 
