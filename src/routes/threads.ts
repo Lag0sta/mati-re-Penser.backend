@@ -80,16 +80,16 @@ router.put('/editComment', async (req, res) => {
                 return;
             }
 
-        const editComment = await Thread.findOneAndUpdate({ _id: id }, { text }, { new: true });
+        const editedComment = await Thread.findOneAndUpdate({ _id: id }, { text }, { new: true });
 
-        if (!editComment) {
+        if (!editedComment) {
             console.warn('❌ Commentaire non trouvé');
             res.json({ result: false, message: 'Commentaire non trouvé' });
             return;
         }
 
         console.log(`✅ Commentaire modifié`);
-        res.json({ result: true, message: 'Commentaire mis à jour', editComment });
+        res.json({ result: true, message: 'Commentaire mis à jour', editedComment });
 
     });
 
