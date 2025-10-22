@@ -109,7 +109,7 @@ router.post('/topicContent', async (req, res) => {
 
         if (!topic) {
             console.warn('❌ Sujet non trouvé');
-            res.json({ result: false, error: 'Sujet non trouvé' });
+            res.json({ result: false, message: 'Sujet non trouvé' });
             return;
         }
 
@@ -118,7 +118,7 @@ router.post('/topicContent', async (req, res) => {
 
         if (!threads) {
             console.warn('❌ Discussions non trouvées');
-            res.json({ result: false, error: 'discussion non trouvé' });
+            res.json({ result: false, message: 'discussion non trouvé' });
             return;
         }
         console.log('➡️ threads', threads)
@@ -144,10 +144,10 @@ router.post('/topicContent', async (req, res) => {
             })),
         };
 
-        res.json({ result: true, discussion, success: `✅ discussion "${discussion.title}" récupérée` });
+        res.json({ result: true, discussion, message: `✅ discussion "${discussion.title}" récupérée` });
     } catch (error) {
         console.error('❌ Erreur serveur lors de /topicContent:', error);
-        res.status(500).json({ result: false, error: 'Erreur de serveur' });
+        res.status(500).json({ result: false, message: 'Erreur de serveur' });
     }
 });
 
