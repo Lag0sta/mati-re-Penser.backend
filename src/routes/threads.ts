@@ -53,7 +53,7 @@ router.post('/newComment', async (req, res) => {
 
         await savedThread.populate({
             path: 'createdBy',
-            select: 'avatar',
+            select: 'avatar pseudo',
         });
         console.log('🎨 Données utilisateur peuplées pour le commentaire');
 
