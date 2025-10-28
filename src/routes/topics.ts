@@ -116,11 +116,14 @@ router.post('/topicContent', async (req, res) => {
         const threads = await Thread.find({ topic: topic._id })
             .populate({ path: 'createdBy', select: 'pseudo avatar ' })
 
+        
+
         if (!threads) {
             console.warn('❌ Discussions non trouvées');
             res.json({ result: false, message: 'discussion non trouvé' });
             return;
         }
+
         console.log('➡️ threads', threads)
 
         const comments = await Comment.find({ thread: { $in: threads.map(thread => thread._id) } })
@@ -138,9 +141,9 @@ router.post('/topicContent', async (req, res) => {
             topicThread: threads.map(thread => ({
                 id: thread._id,
                 text: thread.text,
+                quote: thread.quote,
                 createdBy: thread.createdBy,
                 creationDate: thread.creationDate,
-                // comments: commentsByThread[thread._id.toString()] || [] //va récupérer les {commentaires} push à partir de chaque thread._id précédement
             })),
         };
 
