@@ -66,7 +66,7 @@ router.post('/newComment', async (req, res) => {
 
     } catch (error) {
         console.error('🔥 Erreur serveur /newComment:', error);
-        res.status(500).json({ result: false, error: 'Server error' });
+        res.status(500).json({ result: false, error: error.message });
     }
 });
 
