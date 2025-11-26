@@ -13,7 +13,6 @@ router.post('/newReview', async (req, res) => {
     
      const newReview = new Review({
       name: name,
-      mail: mail,
       title: title,
       creationDate: new Date(),
       text: text,
