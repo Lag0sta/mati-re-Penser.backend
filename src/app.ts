@@ -6,6 +6,7 @@ import userRouter from './routes/users';
 import topicRouter from './routes/topics';
 import threadRouter from './routes/threads';
 import uploadsRouter from './routes/uploads';
+import reviewRouter from './routes/reviews';
 
 const app = express();
 
@@ -26,5 +27,6 @@ app.use('/users', userRouter);
 app.use('/topics', topicRouter);
 app.use('/threads', threadRouter);
 app.use('/uploads', uploadsRouter);
+app.use('/reviews', reviewRouter);
 
 export default app;
