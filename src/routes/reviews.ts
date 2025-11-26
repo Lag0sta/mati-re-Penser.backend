@@ -4,9 +4,9 @@ import Review from '../models/reviews';
 const router = Router();
 
 router.post('/newReview', async (req, res) => {
-  const { name, mail, title, text, rating } = req.body;
+  const { name, title, text, rating } = req.body;
 
-  if(!name || !mail || !title || !text || !rating){
+  if(!name || !title || !text || !rating){
     res.json({result : false, message: 'Veuillez remplir tous les champs'})
     return
   }
