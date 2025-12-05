@@ -1,19 +1,20 @@
 import { Router } from 'express';
 import Topic from '../models/topics';
 import Thread from '../models/threads';
-import User from '../models/users';
-import Comment from '../models/comments';
+
+import { validate } from "../middlewares/validate";
+import { newCommentSchema, editCommentSchema, deleteCommentSchema } from "../schemas/threads.schema";
 
 import { checkToken } from '../utils/authActions';
 
 const router = Router();
 
-router.post('/newComment', async (req, res) => {
+//route pour envoyer un nouveau commentaire dans le topic d'un forum
+router.post('/newComment', validate(newCommentSchema), async (req, res) => {
     console.log('➡️ [POST] /newComment');
 
     try {
         const { token, title, text, quote } = req.body;
-        console.log('📨 Données reçues:', { tokenPresent: !!token, title, textPresent: !!text });
 
         const authResponse = await checkToken({ token });
 
@@ -25,12 +26,6 @@ router.post('/newComment', async (req, res) => {
         const user = authResponse.user
 
         console.log(`👤 Utilisateur identifié: ${user.pseudo} (${user.email})`);
-
-        if (!text) {
-            console.warn('⚠️ Champ texte vide');
-            res.json({ result: false, error: 'remplissez les champs' });
-            return;
-        }
 
         const topic = await Topic.findOne({ title: title });
         if (!topic) {
@@ -70,7 +65,7 @@ router.post('/newComment', async (req, res) => {
     }
 });
 
-router.put('/editComment', async (req, res) => {
+router.put('/editComment', validate(editCommentSchema), async (req, res) => {
         const { token, text, id } = req.body
         console.log('➡️ [PUT] /editResponse');
 
@@ -84,17 +79,15 @@ router.put('/editComment', async (req, res) => {
         const editedComment = await Thread.findOneAndUpdate({ _id: id }, { text }, { new: true });
 
         if (!editedComment) {
-            console.warn('❌ Commentaire non trouvé');
-            res.json({ result: false, message: 'Commentaire non trouvé' });
+            res.json({ result: false, message: '❌ Commentaire non trouvé' });
             return;
         }
 
-        console.log(`✅ Commentaire modifié`);
-        res.json({ result: true, message: 'Commentaire mis à jour', editedComment });
+        res.json({ result: true, message: '✅ Commentaire mis à jour ', editedComment });
 
     });
 
-    router.delete('/deleteComment', async (req, res) => {
+    router.delete('/deleteComment', validate(deleteCommentSchema), async (req, res) => {
         const { token, id } = req.body
         console.log('➡️ [DELETE] /deleteComment');
 

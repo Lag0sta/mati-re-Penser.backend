@@ -14,7 +14,8 @@
     "multer": "^2.0.1",
     "nodemailer": "^7.0.6",
     "serverless-http": "^3.2.0",
-    "uid2": "^1.0.0"
+    "uid2": "^1.0.0",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

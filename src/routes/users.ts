@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import User from '../models/users';
 
+import { validate } from "../middlewares/validate";
+import { signUpSchema, avatarSchema } from "../schemas/users.schema";
+
 import rateLimit from "express-rate-limit";
 import dns from "dns/promises";
-
 
 import { checkToken } from '../utils/authActions';
 
@@ -42,31 +44,23 @@ async function hasValidMX(email: string): Promise<boolean> {
 }
 
 // Création d'un nouvel utilisateur
-router.post('/signup', signupLimiter, async (req, res) => {
+router.post('/signup', validate(signUpSchema), signupLimiter, async (req, res) => {
   try {
     const { pseudo, email, password, confirmPassword, name, surname, hp } = req.body;
-    console.log('➡️ [POST] /signup - Tentative de création de compte');
 
     //vérification de bot
     if (hp && hp.trim() !== "") {
-     res.json({ success: false, reason: "Bot détecté" });
-     return
-    }
-
-    if (!pseudo || !email || !password || !name || !surname) {
-      console.warn('⚠️ Champs manquants');
-      res.json({ result: false, error: 'remplissez les champs' });
-      return;
+      res.json({ success: false, reason: "Bot détecté" });
+      return
     }
 
     //vérification de syntaxe du mail
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
     if (!emailRegex.test(email)) {
-      console.warn('⚠️ Email invalide');
-      res.json({ result: false, error: "adresse @mail invalide" });
+      res.json({ result: false, error: "⚠️ adresse @mail invalide" });
       return;
     }
-    
+
     //vérification du MX
     if (!(await hasValidMX(email))) {
       res.json({ success: false, reason: "Domaine email invalide" });
@@ -78,21 +72,18 @@ router.post('/signup', signupLimiter, async (req, res) => {
       $or: [{ pseudo: pseudo }, { email: email }],
     });
     if (userData) {
-      console.warn("⚠️ Utilisateur ou email déjà existant");
-      res.json({ result: false, error: "nom d'utilisateur ou  @mail déja utilisé" });
+      res.json({ result: false, error: "⚠️ nom d'utilisateur ou  @mail déja utilisé" });
       return;
     }
-    
+
     //vérification du mot-de-passe
     if (password !== confirmPassword) {
-      console.warn('⚠️ Mots de passe non correspondants');
-      res.json({ result: false, error: "Les mots de passe ne correspondent pas" });
+      res.json({ result: false, error: "⚠️ Les mots de passe ne correspondent pas" });
       return;
     }
 
     //sécurisation du mot-de-passe
     const hash = bcrypt.hashSync(password, 10);
-    console.log('🔐 Mot de passe hashé');
 
     const newUser = new User({
       pseudo,
@@ -100,14 +91,14 @@ router.post('/signup', signupLimiter, async (req, res) => {
       surname,
       email,
       password: hash,
+      isAdmin: false,
     });
 
     await newUser.save();
-    console.log(`✅ Nouvel utilisateur créé : ${newUser.pseudo}`);
 
     res.json({
       result: true,
-      success: 'utilisateur créé avec succès',
+      success: '✅ utilisateur créé avec succès',
       pseudo: newUser.pseudo,
     });
 
@@ -118,21 +109,15 @@ router.post('/signup', signupLimiter, async (req, res) => {
 });
 
 // Route pour modifier l'avatar
-router.put('/avatar', async (req, res) => {
+router.put('/avatar', validate(avatarSchema), async (req, res) => {
   try {
     const { avatar, token } = req.body;
     console.log('➡️ [PUT] /avatar - Modification de l\'avatar');
 
     const authResponse = await checkToken({ token });
-    
-            if (!authResponse.result || !authResponse.user) {
-                res.json({result : false, error : authResponse.error});
-                return;
-            }
-    
-    if (!avatar) {
-      console.warn('⚠️ Avatar non fourni');
-      res.json({ result: false, error: 'choisissez un avatar' });
+
+    if (!authResponse.result || !authResponse.user) {
+      res.json({ result: false, error: authResponse.error });
       return;
     }
 
@@ -142,13 +127,11 @@ router.put('/avatar', async (req, res) => {
     );
 
     if (!user) {
-      console.warn('⚠️ Utilisateur non trouvé');
-      res.status(404).json({ result: false, error: 'Utilisateur non trouvé' });
+      res.status(404).json({ result: false, error: '⚠️ Utilisateur non trouvé' });
       return;
     }
 
-    console.log(`✅ Avatar mis à jour pour ${user.pseudo}`);
-    res.json({ result: true, success: 'avatar modifié', avatar: user.avatar });
+    res.json({ result: true, success: `✅ Avatar mis à jour pour ${user.pseudo}`, avatar: user.avatar });
 
   } catch (error) {
     console.error('❌ Erreur lors de la mise à jour de l\'avatar :', error);

@@ -1,6 +1,8 @@
 
 import { Router } from 'express';
 import User from '../models/users';
+import { validate } from "../middlewares/validate";
+import { signInSchema, authSchema, logoutSchema } from "../schemas/auths.schema";
 
 import { checkToken } from '../utils/authActions';
 
@@ -9,18 +11,12 @@ const bcrypt = require("bcryptjs");
 const uid2 = require('uid2');
 
 //route pour la connection de l'utilisateur
-router.post('/signin', async (req, res) => {
+router.post('/signin', validate(signInSchema), async (req, res) => {
     console.log('➡️ [POST] /signin');
 
     try {
         const { email, password } = req.body;
         console.log('📨 Reçu:', { email });
-
-        if (!email || !password) {
-            console.warn('⚠️ Champs manquants');
-            res.json({ result: false, message: 'remplissez les champs' });
-            return;
-        }
 
         const userData = await User.findOne({ email: email });
 
@@ -37,7 +33,6 @@ router.post('/signin', async (req, res) => {
         );
 
         if (!updatedUser) {
-            console.error('❌ Mise à jour accessToken échouée');
             res.json({ result: false, message: "utilisateur non trouvé" });
             return;
         }
@@ -52,6 +47,7 @@ router.post('/signin', async (req, res) => {
             pseudo: updatedUser.pseudo,
             email: updatedUser.email,
             accessToken: updatedUser.accessToken,
+            isAdmin: updatedUser.isAdmin,
         });
 
     } catch (error) {
@@ -60,21 +56,13 @@ router.post('/signin', async (req, res) => {
     }
 });
 
-
-
 //route pour une 2e auth pour modification sensibles
-router.post('/auth', async (req, res) => {
+router.post('/auth', validate(authSchema), async (req, res) => {
     console.log('➡️ [POST] /auth');
 
     try {
         const { token, password } = req.body;
         console.log('📨 Token reçu:', token ? 'oui' : 'non');
-
-        if (!password) {
-            console.warn('⚠️ Mot de passe manquant');
-            res.json({ result: false, message: 'Veuillez remplir tous les champs' });
-            return;
-        }
 
         const authResponse = await checkToken({ token });
 
@@ -101,7 +89,8 @@ router.post('/auth', async (req, res) => {
     }
 });
 
-router.put('/logout', async (req, res) => {
+//route pour la deconnexion
+router.put('/logout', validate(logoutSchema), async (req, res) => {
     console.log('➡️ [PUT] /logout');
     const { token, id } = req.body
     try {

@@ -1,16 +1,14 @@
 import { Router } from 'express';
 import Review from '../models/reviews';
+import { validate } from "../middlewares/validate";
+import { newReviewSchema } from "../schemas/reviews.schema";
 
 const router = Router();
 
-router.post('/newReview', async (req, res) => {
+//route pour envoyer un avis
+router.post('/newReview', validate(newReviewSchema), async (req, res) => {
   const { name, title, text, rating } = req.body;
-
-  if(!name || !title || !text || !rating){
-    res.json({result : false, message: 'Veuillez remplir tous les champs'})
-    return
-  }
-    
+  
      const newReview = new Review({
       name: name,
       title: title,

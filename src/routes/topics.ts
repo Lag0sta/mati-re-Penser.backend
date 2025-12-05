@@ -1,23 +1,22 @@
 import { Router } from 'express';
 import Topic from '../models/topics';
 import Thread from '../models/threads';
-import User from '../models/users';
-import Comment from '../models/comments';
 
+import { validate } from "../middlewares/validate";
+import { newTopicSchema, topicContentSchema, editTopicSchema, lockTopicSchema } from '../schemas/topics.schema';
 import { checkToken } from '../utils/authActions';
-import { error } from 'console';
 
 const router = Router();
 
+//route pour récupérer tous les topics
 router.get('/', (req, res) => {
-    console.log('➡️ [GET] / - Récupération de tous les topics');
     Topic.find().then((data) => {
-        console.log(`✅ ${data.length} topics récupérés`);
         res.json(data);
     });
 });
 
-router.post('/newTopic', async (req, res) => {
+//route pour créer un sujet
+router.post('/newTopic', validate(newTopicSchema), async (req, res) => {
     console.log('➡️ [POST] /newTopic');
     try {
         const { token, title, description } = req.body;
@@ -31,17 +30,10 @@ router.post('/newTopic', async (req, res) => {
 
         const user = authResponse.user
 
-        if (!title || !description) {
-            console.warn('❌ Champs vides');
-            res.json({ result: false, error: 'Veuillez remplir tous les champs' });
-            return;
-        }
-
         const topic = await Topic.findOne({ title: title });
 
         if (topic) {
-            console.warn('❌ Sujet déjà existant');
-            res.json({ result: false, error: 'Sujet déja existant' });
+            res.json({ result: false, error: '❌ Sujet déja existant' });
             return;
         }
 
@@ -54,15 +46,14 @@ router.post('/newTopic', async (req, res) => {
         });
 
         await newTopic.save();
-        console.log(`✅ Nouveau sujet créé: ${title}`);
         res.json({ result: true, newTopic, success: `✅ Nouveau sujet créé: ${title}` });
 
     } catch (error) {
-        console.error('❌ Erreur serveur lors de la création d’un sujet:', error);
-        res.status(500).json({ result: false, error: 'Erreur de Serveur' });
+        res.status(500).json({ result: false, error: 'Erreur de ❌ Erreur serveur lors de la création d’un sujet' });
     }
 });
 
+//route pour recuperer tous les topics avec le nombre de commentaires
 router.get('/topicsWithThreadCounts', async (req, res) => {
     console.log('➡️ [GET] /topicsWithThreadCounts');
     try {
@@ -98,7 +89,8 @@ router.get('/topicsWithThreadCounts', async (req, res) => {
     }
 });
 
-router.post('/topicContent', async (req, res) => {
+//route pour recuperer le contenu d'un sujet
+router.post('/topicContent', validate(topicContentSchema), async (req, res) => {
     console.log('➡️ [POST] /topicContent');
     try {
         const { title } = req.body;
@@ -108,28 +100,17 @@ router.post('/topicContent', async (req, res) => {
         });
 
         if (!topic) {
-            console.warn('❌ Sujet non trouvé');
-            res.json({ result: false, message: 'Sujet non trouvé' });
+            res.json({ result: false, message: '❌ Sujet non trouvé' });
             return;
         }
 
         const threads = await Thread.find({ topic: topic._id })
             .populate({ path: 'createdBy', select: 'pseudo avatar ' })
 
-        
-
         if (!threads) {
-            console.warn('❌ Discussions non trouvées');
-            res.json({ result: false, message: 'discussion non trouvé' });
+            res.json({ result: false, message: '❌ discussion non trouvé' });
             return;
         }
-
-        console.log('➡️ threads', threads)
-
-        const comments = await Comment.find({ thread: { $in: threads.map(thread => thread._id) } })
-            .populate({ path: 'createdBy', select: 'pseudo avatar ' });
-
-        console.log("➡️ comments :", comments);
 
         const discussion = {
             id: topic._id,
@@ -149,12 +130,12 @@ router.post('/topicContent', async (req, res) => {
 
         res.json({ result: true, discussion, message: `✅ discussion "${discussion.title}" récupérée` });
     } catch (error) {
-        console.error('❌ Erreur serveur lors de /topicContent:', error);
-        res.status(500).json({ result: false, message: 'Erreur de serveur' });
+        res.status(500).json({ result: false, message: '❌ Erreur serveur lors de /topicContent' });
     }
 });
 
-router.put("/editTopic", async (req, res) => {
+//route pour modifier un sujet
+router.put("/editTopic", validate(editTopicSchema), async (req, res) => {
     console.log('➡️ [PUT] /editTopic');
     try {
         const { token, title, description, id } = req.body;
@@ -166,22 +147,14 @@ router.put("/editTopic", async (req, res) => {
             return;
         }
 
-        if (!title || !description) {
-            console.warn('❌ Champs vides');
-            res.json({ result: false, error: 'veuillez remplir tous les champs' });
-            return;
-        }
-
         const topic = await Topic.findOneAndUpdate({ _id: id }, { title, description }, { new: true });
 
         if (!topic) {
-            console.warn('❌ Sujet non trouvé');
-            res.json({ result: false, error: 'Sujet non trouvé' });
+            res.json({ result: false, error: '❌ Sujet non trouvé' });
             return;
         }
 
-        console.log(`✅ Sujet modifié: ${topic.title}`);
-        res.json({ result: true, success: 'Sujet mis à jour', topic });
+        res.json({ result: true, success: '✅ Sujet modifié: ${topic.title}', topic });
 
     } catch (error) {
         console.error('❌ Erreur serveur lors de /editTopic:', error);
@@ -189,27 +162,20 @@ router.put("/editTopic", async (req, res) => {
     }
 });
 
-router.put("/lockTopic", async (req, res) => {
+//route pour verrouiller ou debloquer un sujet
+router.put("/lockTopic", validate(lockTopicSchema), async (req, res) => {
     console.log('➡️ [PUT] /lockTopic');
     try {
         const { token, id, isLocked } = req.body;
 
-        if (!token) {
-            console.warn('❌ Token manquant');
-            res.json({ result: false, error: 'veuillez vous connecter' });
-            return;
-        }
-
         const lockTopic = await Topic.findOneAndUpdate({ _id: id }, { isLocked: !isLocked }, { new: true });
 
         if (!lockTopic) {
-            console.warn('❌ Sujet non trouvé');
-            res.json({ result: false, error: 'Sujet non trouvé' });
+            res.json({ result: false, error: '❌ Sujet non trouvé' });
             return;
         }
 
-        console.log(`✅ Sujet ${lockTopic.title} vérouillé: ${lockTopic.isLocked}`);
-        res.json({ result: true, success: "Sujet vérouillé", isLocked: lockTopic.isLocked });
+        res.json({ result: true, success: `✅ Sujet ${lockTopic.title} vérouillé: ${lockTopic.isLocked}`, isLocked: lockTopic.isLocked });
     } catch (error) {
         console.error('❌ Erreur serveur lors de /lockTopic:', error);
         res.status(500).json({ result: false, error: 'Erreur de serveur' });

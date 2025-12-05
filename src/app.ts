@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 
+import adminRouter from './routes/admin';
 import authRouter from './routes/auths';
 import userRouter from './routes/users';
 import topicRouter from './routes/topics';
@@ -22,6 +23,7 @@ app.get('/test', (_req, res) => {
   res.send('Route test OK');
 });
 
+app.use('/admin', adminRouter);
 app.use('/auths', authRouter);
 app.use('/users', userRouter);
 app.use('/topics', topicRouter);

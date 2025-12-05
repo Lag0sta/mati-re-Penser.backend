@@ -8,7 +8,8 @@ const usersSchema = new mongoose.Schema({
     email: String,
     password: String,
     accessToken: String,
-    submits:[],
+    submits:[{ type: mongoose.Schema.Types.ObjectId }],
+    isAdmin: Boolean,
     resetPasswordToken: String,
     resetPasswordExpires: Date,
 })
