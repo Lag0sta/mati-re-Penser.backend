@@ -95,12 +95,13 @@ router.put('/logout', validate(logoutSchema), async (req, res) => {
     const { token, id } = req.body
     try {
         const logOut = await User.findOneAndUpdate({ _id: id, accessToken: token }, { accessToken: "" }, { new: true });
-        res.json({ result: true, message: "Deconnexion reussie" });
 
         if (!logOut) {
             res.json({ result: false, message: "Utilisateur non trouvé ou déjà déconnecté" });
             return
         }
+
+        res.json({ result: true, message: "Deconnexion reussie" });
 
     } catch (error) {
         console.error('🔥 Erreur interne /logout:', error);
