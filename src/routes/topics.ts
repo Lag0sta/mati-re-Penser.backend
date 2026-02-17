@@ -90,7 +90,7 @@ router.get('/topicsWithThreadCounts', async (req, res) => {
 });
 
 //route pour recuperer le contenu d'un sujet
-router.post('/topicContent', validate(topicContentSchema), async (req, res) => {
+router.post('/topicContent', async (req, res) => {
     console.log('➡️ [POST] /topicContent');
     try {
         const { title } = req.body;
