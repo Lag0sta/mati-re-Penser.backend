@@ -8,7 +8,17 @@ const router = Router();
 //route pour envoyer un avis
 router.post('/newReview', validate(newReviewSchema), async (req, res) => {
   const { name, title, text, rating } = req.body;
+
+  if(!name || !title || !text ){
+    res.json({result: false, error: '❌ veuillez remplir tous les champs'})
+    return
+  } 
   
+  if(!rating || rating < 1 || rating > 5){
+    res.json({result: false, error: '❌ la note doit etre comprise entre 1 et 5'})
+    return
+  }
+    
      const newReview = new Review({
       name: name,
       title: title,
