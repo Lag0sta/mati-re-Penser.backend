@@ -9,15 +9,15 @@ const router = Router();
 router.post('/newReview', validate(newReviewSchema), async (req, res) => {
   const { name, title, text, rating } = req.body;
 
-  if(!name || !title || !text ){
-    res.json({result: false, message: '❌ veuillez remplir tous les champs'})
-    return
-  } 
+  // if(!name || !title || !text ){
+  //   res.json({result: false, message: '❌ veuillez remplir tous les champs'})
+  //   return
+  // } 
   
-  if(!rating || rating < 1 || rating > 5){
-    res.json({result: false, message: '❌ la note doit etre comprise entre 1 et 5'})
-    return
-  }
+  // if(!rating || rating < 1 || rating > 5){
+  //   res.json({result: false, message: '❌ la note doit etre comprise entre 1 et 5'})
+  //   return
+  // }
     
      const newReview = new Review({
       name: name,
