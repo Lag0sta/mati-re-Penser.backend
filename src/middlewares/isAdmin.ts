@@ -24,7 +24,7 @@ export const requireAdmin = [
 
     const user = await User.findOne({ accessToken: token });
     if (!user || !user.isAdmin) {
-       res.status(403).json({ message: "Accès interdit" });
+       res.status(401).json({ message: "Accès interdit" });
        return
     }
 

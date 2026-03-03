@@ -8,6 +8,7 @@ import topicRouter from './routes/topics';
 import threadRouter from './routes/threads';
 import uploadsRouter from './routes/uploads';
 import reviewRouter from './routes/reviews';
+import bookRouter from './routes/books';
 
 const app = express();
 
@@ -30,5 +31,6 @@ app.use('/topics', topicRouter);
 app.use('/threads', threadRouter);
 app.use('/uploads', uploadsRouter);
 app.use('/reviews', reviewRouter);
+app.use('/books', bookRouter);
 
 export default app;
