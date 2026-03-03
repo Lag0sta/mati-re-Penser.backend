@@ -10,6 +10,6 @@ const booksSchema = new mongoose.Schema({
     isArchived: Boolean
 })
 
-const Book = mongoose.model('comments', booksSchema);
+const Book = mongoose.model('books', booksSchema);
 
 export default Book;
