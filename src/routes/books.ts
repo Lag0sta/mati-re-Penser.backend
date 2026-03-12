@@ -22,7 +22,7 @@ router.get('/publications', async (req, res) => {
 //route pour enregistrer le nouveau sujet
 router.post("/newBookInfo", async (req, res) => {
     try {
-        const { pseudo,token, titre, text } = req.body;
+        const { pseudo, token, titre, text } = req.body;
 
         const authResponse = await checkAdmin({ token, pseudo });
 
@@ -51,4 +51,55 @@ router.post("/newBookInfo", async (req, res) => {
     }
 });
 
+router.put("/editBookText", async (req, res) => {
+    try {
+        const {text, titre, id, token, pseudo} = req.body
+
+        const authResponse = await checkAdmin({ token, pseudo });
+
+        if (!authResponse.result || !authResponse.user) {
+            res.json({ result: false, error: authResponse.error });
+            return;
+        }
+
+        const editedBook = await Book.findOneAndUpdate({ _id: id }, { text, titre }, { new: true });
+
+         if (!editedBook) {
+            res.json({ result: false, message: '❌ Commentaire non trouvé' });
+            return;
+        }
+
+        res.json({ result: true, message: '✅ Commentaire mis à jour ', editedBook });
+
+    } catch (error) {
+        console.error('🔥 Erreur serveur /editBook:', error);
+        res.status(500).json({ result: false, error: error });
+    }
+})
+
+router.put("/editBookImg", async (req, res) => {
+    try {
+        const {img, id, token, pseudo} = req.body
+
+        const authResponse = await checkAdmin({ token, pseudo });
+
+        if (!authResponse.result || !authResponse.user) {
+            res.json({ result: false, error: authResponse.error });
+            return;
+        }
+
+        const editedBook = await Book.findOneAndUpdate({ _id: id }, { img }, { new: true });
+
+         if (!editedBook) {
+            res.json({ result: false, message: '❌ Commentaire non trouvé' });
+            return;
+        }
+
+        res.json({ result: true, message: '✅ Commentaire mis à jour ', editedBook });
+        
+    } catch (error) {
+        console.error('🔥 Erreur serveur /editBook:', error);
+        res.status(500).json({ result: false, error: error });
+    }
+})
 export default router;
