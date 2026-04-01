@@ -65,11 +65,11 @@ router.put("/editBookText", async (req, res) => {
         const editedBook = await Book.findOneAndUpdate({ _id: id }, { text, titre }, { new: true });
 
          if (!editedBook) {
-            res.json({ result: false, message: '❌ Commentaire non trouvé' });
+            res.json({ result: false, message: '❌ Publication non trouvé' });
             return;
         }
 
-        res.json({ result: true, message: '✅ Commentaire mis à jour ', editedBook });
+        res.json({ result: true, message: '✅ Publication mis à jour ', editedBook });
 
     } catch (error) {
         console.error('🔥 Erreur serveur /editBook:', error);
@@ -91,7 +91,34 @@ router.put("/editBookImg", async (req, res) => {
         const editedBook = await Book.findOneAndUpdate({ _id: id }, { img }, { new: true });
 
          if (!editedBook) {
-            res.json({ result: false, message: '❌ Commentaire non trouvé' });
+            res.json({ result: false, message: '❌ Publication non trouvé' });
+            return;
+        }
+
+        res.json({ result: true, message: '✅ Publication mis à jour ', editedBook });
+        
+    } catch (error) {
+        console.error('🔥 Erreur serveur /editBook:', error);
+        res.status(500).json({ result: false, error: error });
+    }
+})
+
+
+router.put("/archiveStatus", async (req, res) => {
+    try {
+        const {isArchived, id, token, pseudo} = req.body
+
+        const authResponse = await checkAdmin({ token, pseudo });
+
+        if (!authResponse.result || !authResponse.user) {
+            res.json({ result: false, error: authResponse.error });
+            return;
+        }
+
+        const editedBook = await Book.findOneAndUpdate({ _id: id }, { isArchived }, { new: true });
+
+         if (!editedBook) {
+            res.json({ result: false, message: '❌ Publication non trouvé' });
             return;
         }
 
@@ -102,4 +129,5 @@ router.put("/editBookImg", async (req, res) => {
         res.status(500).json({ result: false, error: error });
     }
 })
+
 export default router;
