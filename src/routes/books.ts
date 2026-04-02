@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import Book from '../models/books';
 import { checkAdmin } from '../utils/authActions';
-
+import { validate } from "../middlewares/validate";
+import { newBookInfoSchema, editBookTextSchema, editBookImgSchema, archiveStatusSchema } from "../schemas/books.schema";
 
 const router = Router();
 
@@ -20,7 +21,7 @@ router.get('/publications', async (req, res) => {
 });
 
 //route pour enregistrer le nouveau sujet
-router.post("/newBookInfo", async (req, res) => {
+router.post("/newBookInfo", validate(newBookInfoSchema), async (req, res) => {
     try {
         const { pseudo, token, titre, text } = req.body;
 
@@ -51,7 +52,7 @@ router.post("/newBookInfo", async (req, res) => {
     }
 });
 
-router.put("/editBookText", async (req, res) => {
+router.put("/editBookText", validate(editBookTextSchema), async (req, res) => {
     try {
         const {text, titre, id, token, pseudo} = req.body
 
@@ -77,7 +78,7 @@ router.put("/editBookText", async (req, res) => {
     }
 })
 
-router.put("/editBookImg", async (req, res) => {
+router.put("/editBookImg", validate(editBookImgSchema), async (req, res) => {
     try {
         const {img, id, token, pseudo} = req.body
 
@@ -104,7 +105,7 @@ router.put("/editBookImg", async (req, res) => {
 })
 
 
-router.put("/archiveStatus", async (req, res) => {
+router.put("/archiveStatus", validate(archiveStatusSchema), async (req, res) => {
     try {
         const {isArchived, id, token, pseudo} = req.body
 
