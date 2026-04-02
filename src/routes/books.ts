@@ -8,14 +8,11 @@ const router = Router();
 
 //route pour recuperer tous les topics avec le nombre de commentaires
 router.get('/publications', async (req, res) => {
-    console.log('➡️ [GET] /publications');
     try {
         const topics = await Book.find();
 
-        console.log("✅", topics, "commentaires retournés");
         res.json({ topics, success: ` publications trouvés` });
     } catch (error) {
-        console.error('❌ Erreur serveur:', error);
         res.status(500).json({ result: false, error: 'Erreur de serveur' });
     }
 });
@@ -47,7 +44,6 @@ router.post("/newBookInfo", validate(newBookInfoSchema), async (req, res) => {
             creationDate: newBookInfo.creationDate,
         });
     } catch (error) {
-        console.error('🔥 Erreur serveur /newBook:', error);
         res.status(500).json({ result: false, error: error });
     }
 });
@@ -73,7 +69,6 @@ router.put("/editBookText", validate(editBookTextSchema), async (req, res) => {
         res.json({ result: true, message: '✅ Publication mis à jour ', editedBook });
 
     } catch (error) {
-        console.error('🔥 Erreur serveur /editBook:', error);
         res.status(500).json({ result: false, error: error });
     }
 })
@@ -99,11 +94,9 @@ router.put("/editBookImg", validate(editBookImgSchema), async (req, res) => {
         res.json({ result: true, message: '✅ Publication mis à jour ', editedBook });
         
     } catch (error) {
-        console.error('🔥 Erreur serveur /editBook:', error);
         res.status(500).json({ result: false, error: error });
     }
 })
-
 
 router.put("/archiveStatus", validate(archiveStatusSchema), async (req, res) => {
     try {
@@ -126,7 +119,6 @@ router.put("/archiveStatus", validate(archiveStatusSchema), async (req, res) => 
         res.json({ result: true, message: '✅ Commentaire mis à jour ', editedBook });
         
     } catch (error) {
-        console.error('🔥 Erreur serveur /editBook:', error);
         res.status(500).json({ result: false, error: error });
     }
 })

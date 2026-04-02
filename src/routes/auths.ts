@@ -12,11 +12,9 @@ const uid2 = require('uid2');
 
 //route pour la connection de l'utilisateur
 router.post('/signin', validate(signInSchema), async (req, res) => {
-    console.log('➡️ [POST] /signin');
 
     try {
         const { email, password } = req.body;
-        console.log('📨 Reçu:', { email });
 
         const userData = await User.findOne({ email: email });
 
@@ -37,8 +35,6 @@ router.post('/signin', validate(signInSchema), async (req, res) => {
             return;
         }
 
-        console.log(`✅ Connexion réussie pour ${updatedUser.email}`);
-
         res.json({
             result: true,
             message: `Bonjour ${updatedUser.pseudo}`,
@@ -51,18 +47,15 @@ router.post('/signin', validate(signInSchema), async (req, res) => {
         });
 
     } catch (error) {
-        console.error('🔥 Erreur interne /signin:', error);
         res.json({ result: false, message: 'erreur de connection' });
     }
 });
 
 //route pour une 2e auth pour modification sensibles
 router.post('/auth', validate(authSchema), async (req, res) => {
-    console.log('➡️ [POST] /auth');
 
     try {
         const { token, password } = req.body;
-        console.log('📨 Token reçu:', token ? 'oui' : 'non');
 
         const authResponse = await checkToken({ token });
 
@@ -75,23 +68,19 @@ router.post('/auth', validate(authSchema), async (req, res) => {
 
         const isMatch = await bcrypt.compare(password, user?.password);
         if (!isMatch) {
-            console.warn(`❌ Mot de passe incorrect pour ${user.email}`);
             res.json({ result: false, message: 'Mot de passe incorrect' });
             return;
         }
 
-        console.log(`✅ Authentification réussie pour ${user.email}`);
         res.json({ result: true, message: 'Authentification réussie' });
 
     } catch (error) {
-        console.error('🔥 Erreur interne /auth:', error);
         res.json({ result: false, message: 'Erreur interne du serveur' });
     }
 });
 
 //route pour la deconnexion
 router.put('/logout', validate(logoutSchema), async (req, res) => {
-    console.log('➡️ [PUT] /logout');
     const { token, id } = req.body
     try {
         const logOut = await User.findOneAndUpdate({ _id: id, accessToken: token }, { accessToken: "" }, { new: true });
@@ -104,7 +93,6 @@ router.put('/logout', validate(logoutSchema), async (req, res) => {
         res.json({ result: true, message: "Deconnexion reussie" });
 
     } catch (error) {
-        console.error('🔥 Erreur interne /logout:', error);
         res.json({ result: false, message: 'Erreur interne du serveur' });
     }
 })

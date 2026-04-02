@@ -13,12 +13,9 @@ const router = Router();
 const bcrypt = require("bcryptjs");
 
 router.get('/', (req, res) => {
-  console.log('➡️ [GET] /users - Récupération des utilisateurs');
   User.find().then((data) => {
-    console.log(`✅ ${data.length} utilisateurs récupérés`);
     res.json(data);
   }).catch(error => {
-    console.error('❌ Erreur lors de la récupération des utilisateurs :', error);
     res.status(500).json({ result: false, error: 'Erreur serveur' });
   });
 });
@@ -103,7 +100,6 @@ router.post('/signup', validate(signUpSchema), signupLimiter, async (req, res) =
     });
 
   } catch (error) {
-    console.error("❌ Erreur lors de l'enregistrement de l'utilisateur :", error);
     res.json({ result: false, error: "erreur en sauvegarde de l'utilisateur" });
   }
 });
@@ -112,7 +108,6 @@ router.post('/signup', validate(signUpSchema), signupLimiter, async (req, res) =
 router.put('/avatar', validate(avatarSchema), async (req, res) => {
   try {
     const { avatar, token } = req.body;
-    console.log('➡️ [PUT] /avatar - Modification de l\'avatar');
 
     const authResponse = await checkToken({ token });
 
@@ -134,7 +129,6 @@ router.put('/avatar', validate(avatarSchema), async (req, res) => {
     res.json({ result: true, success: `✅ Avatar mis à jour pour ${user.pseudo}`, avatar: user.avatar });
 
   } catch (error) {
-    console.error('❌ Erreur lors de la mise à jour de l\'avatar :', error);
     res.json({ result: false, error: 'erreur lors de la connection' });
   }
 });
