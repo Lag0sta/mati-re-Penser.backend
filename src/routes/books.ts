@@ -9,9 +9,9 @@ const router = Router();
 //route pour recuperer tous les topics avec le nombre de commentaires
 router.get('/publications', async (req, res) => {
     try {
-        const topics = await Book.find();
+        const books = await Book.find();
 
-        res.json({ topics, success: ` publications trouvés` });
+        res.json({ books, success: ` publications trouvés` });
     } catch (error) {
         res.status(500).json({ result: false, error: 'Erreur de serveur' });
     }

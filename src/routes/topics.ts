@@ -158,7 +158,6 @@ router.put("/editTopic", validate(editTopicSchema), async (req, res) => {
 
 //route pour verrouiller ou debloquer un sujet
 router.put("/lockTopic", validate(lockTopicSchema), async (req, res) => {
-    console.log('➡️ [PUT] /lockTopic');
     try {
         const { token, id, isLocked } = req.body;
 

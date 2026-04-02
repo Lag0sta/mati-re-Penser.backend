@@ -85,7 +85,7 @@ router.put('/editComment', validate(editCommentSchema), async (req, res) => {
         if (!authResponse.result) {
                 res.json({result : false, message : authResponse.error});
                 return;
-            }
+        }
 
         const deleteComment = await Thread.findOneAndDelete({ _id: id });
 
