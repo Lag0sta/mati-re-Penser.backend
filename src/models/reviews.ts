@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 
 const reviewsSchema = new mongoose.Schema({
+    book: { type: mongoose.Schema.Types.ObjectId, ref: 'books' },
     name: String,
     title: String,
-    creationDate: Date,
     text: String,
     rating: Number,
+    creationDate: Date,
 })
 
 const Review = mongoose.model('reviews', reviewsSchema); 
