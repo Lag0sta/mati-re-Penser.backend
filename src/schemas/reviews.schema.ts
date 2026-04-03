@@ -8,3 +8,8 @@ export const newReviewSchema = z.object({
     text: z.string().min(1, { message: "Le texte est obligatoire" }),
     rating: z.number().min(1, { message: "La note est obligatoire" }),
 }) 
+
+export const reviewsSchema = z.object({
+    id: z.string().regex(objectIdRegex, { message: "L'auteur doit être un ObjectId valide" }),
+
+})

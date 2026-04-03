@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import Review from '../models/reviews';
 import { validate } from "../middlewares/validate";
-import { newReviewSchema } from "../schemas/reviews.schema";
+import { newReviewSchema, reviewsSchema } from "../schemas/reviews.schema";
 
 const router = Router();
 
@@ -20,6 +20,14 @@ router.post('/newReview', validate(newReviewSchema), async (req, res) => {
 
   const savedReview = await newReview.save();
   res.json({ result: true, message: 'Avis envoyé', review: savedReview })
+})
+
+router.post('/reviews', validate(reviewsSchema), async (req, res) => {
+  const { id } = req.body;
+
+  Review.find({ book: id }).then((data) => {
+    res.json({ result: true, message: 'Avis envoyés', reviews: data })
+  })
 })
 
 export default router;
