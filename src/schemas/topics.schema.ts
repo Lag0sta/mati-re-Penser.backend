@@ -9,7 +9,7 @@ export const newTopicSchema  = z.object({
 })
 
 export const topicContentSchema = z.object({
-    topic: z.string().min(1, { message: "Le sujet est obligatoire" })
+    title: z.string().min(1, { message: "Le sujet est obligatoire" })
 })
 
 export const editTopicSchema = z.object({
