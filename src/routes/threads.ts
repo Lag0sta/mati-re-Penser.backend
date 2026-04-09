@@ -5,6 +5,7 @@ import { validate } from "../middlewares/validate";
 import { newCommentSchema, editCommentSchema, deleteCommentSchema } from "../schemas/threads.schema";
 
 import { checkToken } from '../utils/authActions';
+import User from '../models/users';
 
 const router = Router();
 
@@ -79,12 +80,29 @@ router.put('/editComment', validate(editCommentSchema), async (req, res) => {
     });
 
     router.delete('/deleteComment', validate(deleteCommentSchema), async (req, res) => {
-        const { token, id } = req.body
+        const { token, id, pseudo, password } = req.body
         const authResponse = await checkToken({ token });
 
         if (!authResponse.result) {
                 res.json({result : false, message : authResponse.error});
                 return;
+        }
+
+        const userAuth = await User.findOne({accessToken: token, pseudo})
+
+        if (!userAuth) {
+            res.json({ result: false, message: '❌ Utilisateur non rencontré' });
+            return;
+        }
+
+        if(!userAuth.isAdmin) {
+            res.json({ result: false, message: '❌ Utilisateur non autorisé' });
+            return;
+        }
+
+        if(userAuth.password !== password) {
+            res.json({ result: false, message: '❌ Mot de passe incorrect' });
+            return;
         }
 
         const deleteComment = await Thread.findOneAndDelete({ _id: id });
