@@ -5,6 +5,7 @@ import { validate } from "../middlewares/validate";
 import { newCommentSchema, editCommentSchema, deleteCommentSchema } from "../schemas/threads.schema";
 
 import { checkToken } from '../utils/authActions';
+const bcrypt = require("bcryptjs");
 import User from '../models/users';
 
 const router = Router();
@@ -100,8 +101,8 @@ console.log("pseudo reçu:", pseudo)
             return;
         }
 
-        if(userAuth.password !== password) {
-            res.json({ result: false, message: '❌ Mot de passe incorrect' });
+        if(!bcrypt.compareSync(password, userAuth.password)) {
+            res.json({ result: false, message: "mauvais identifiants" });
             return;
         }
 
