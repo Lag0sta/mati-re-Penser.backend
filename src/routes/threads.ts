@@ -87,7 +87,7 @@ router.put('/editComment', validate(editCommentSchema), async (req, res) => {
                 res.json({result : false, message : authResponse.error});
                 return;
         }
-
+console.log("pseudo reçu:", pseudo)
         const userAuth = await User.findOne({pseudo})
 
         if (!userAuth) {

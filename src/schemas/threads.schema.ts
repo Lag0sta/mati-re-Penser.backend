@@ -18,6 +18,7 @@ export const editCommentSchema = z.object({
 export const deleteCommentSchema = z.object({
     token: z.string().min(1, { message: "Le token est obligatoire" }),
     id: z.string().regex(objectIdRegex, { message: "L'auteur doit être un ObjectId valide" }),
-
+    pseudo: z.string().min(1, { message: "Le pseudo est obligatoire" }),
+    password: z.string().min(1, { message: "Le mot de passe est obligatoire" }),
 })
 
