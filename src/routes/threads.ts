@@ -88,7 +88,7 @@ router.put('/editComment', validate(editCommentSchema), async (req, res) => {
                 return;
         }
 
-        const userAuth = await User.findOne({accessToken: token, pseudo})
+        const userAuth = await User.findOne({pseudo})
 
         if (!userAuth) {
             res.json({ result: false, message: '❌ Utilisateur non rencontré' });
