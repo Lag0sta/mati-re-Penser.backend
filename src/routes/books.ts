@@ -126,7 +126,7 @@ router.put("/archiveStatus", validate(archiveStatusSchema), async (req, res) => 
 
 router.put("/editBookMarketURL", validate(editBookMarketUrlSchema), async (req, res) => {
     try{
-        const {isArchived, id, token, pseudo, url} = req.body
+        const { id, token, pseudo, url} = req.body
 
         const authResponse = await checkAdmin({ token, pseudo });
 
@@ -142,7 +142,7 @@ router.put("/editBookMarketURL", validate(editBookMarketUrlSchema), async (req, 
             return;
         }
 
-        const editedBook = await Book.findOneAndUpdate({ _id: id, isArchived }, { url }, { new: true });
+        const editedBook = await Book.findOneAndUpdate({ _id: id }, { lien: url }, { new: true });
 
         res.json({ result: true, message: '✅ Publication mis à jour ', editedBook });
 
