@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import Book from '../models/books';
+import User from '../models/users';
 import { checkAdmin } from '../utils/authActions';
 import { validate } from "../middlewares/validate";
-import { newBookInfoSchema, editBookTextSchema, editBookImgSchema, archiveStatusSchema } from "../schemas/books.schema";
+import { newBookInfoSchema, editBookTextSchema, editBookImgSchema, archiveStatusSchema, editBookMarketUrlSchema } from "../schemas/books.schema";
 
 const router = Router();
 
@@ -116,9 +117,36 @@ router.put("/archiveStatus", validate(archiveStatusSchema), async (req, res) => 
             return;
         }
 
-        res.json({ result: true, message: '✅ Commentaire mis à jour ', editedBook });
+        res.json({ result: true, message: '✅ Publication mis à jour ', editedBook });
         
     } catch (error) {
+        res.status(500).json({ result: false, error: error });
+    }
+})
+
+router.put("/editBookMarketURL", validate(editBookMarketUrlSchema), async (req, res) => {
+    try{
+        const {isArchived, id, token, pseudo, url} = req.body
+
+        const authResponse = await checkAdmin({ token, pseudo });
+
+        if (!authResponse.result || !authResponse.user) {
+            res.json({ result: false, error: authResponse.error });
+            return;
+        }
+
+        const isAdmin = await User.findOne({ pseudo });
+
+        if(!isAdmin?.isAdmin) {
+            res.json({ result: false, message: '❌ Utilisateur non autorisé' });
+            return;
+        }
+
+        const editedBook = await Book.findOneAndUpdate({ _id: id, isArchived }, { url }, { new: true });
+
+        res.json({ result: true, message: '✅ Publication mis à jour ', editedBook });
+
+    }catch(error){
         res.status(500).json({ result: false, error: error });
     }
 })

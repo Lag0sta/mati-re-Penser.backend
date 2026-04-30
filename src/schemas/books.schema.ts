@@ -30,3 +30,10 @@ export const archiveStatusSchema = z.object({
     id: z.string().regex(objectIdRegex, { message: "L'auteur doit être un ObjectId valide" }),
     isArchived: z.boolean()
 })
+
+export const editBookMarketUrlSchema = z.object({
+    token: z.string().min(1, { message: "Le token est obligatoire" }),
+    pseudo: z.string().min(1, { message: "Le token est obligatoire" }),
+    url: z.string().min(1, { message: "Le token est obligatoire" }),
+    id: z.string().regex(objectIdRegex, { message: "L'auteur doit être un ObjectId valide" }),
+})
