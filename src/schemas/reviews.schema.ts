@@ -15,6 +15,7 @@ export const reviewsSchema = z.object({
 
 export const deleteReviewSchema = z.object({
     id: z.string().regex(objectIdRegex, { message: "le review doit être un ObjectId valide" }),
+    token: z.string().min(1, { message: "Le token est obligatoire" }),
     pseudo: z.string().min(1, { message: "Le pseudo est obligatoire" }),
     password: z.string().min(1, { message: "Le mot de passe est obligatoire" }),
 })
