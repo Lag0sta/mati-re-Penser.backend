@@ -11,7 +11,6 @@ export const newReviewSchema = z.object({
 
 export const reviewsSchema = z.object({
     id: z.string().regex(objectIdRegex, { message: "le review doit être un ObjectId valide" }),
-
 })
 
 export const deleteReviewSchema = z.object({
