@@ -10,8 +10,7 @@ import { checkToken } from '../utils/authActions';
 const router = Router();
 const bcrypt = require("bcryptjs");
 const uid2 = require('uid2');
-const API_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
-
+const API_URL = process.env.FRONTEND_URL;
 
 //route pour la connection de l'utilisateur
 router.post('/signin', validate(signInSchema), async (req, res) => {
