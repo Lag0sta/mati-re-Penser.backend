@@ -148,7 +148,7 @@ router.post('/forgotPassword', async (req, res): Promise<void> => {
     res.json({ result: true, message: 'Email de réinitialisation envoyé.' });
   } catch (error) {
     console.error(error);
-    res.json({ result: false, message: 'Erreur du serveur.' });
+    res.json({ result: false, message: 'Erreur du serveur.', cause: error });
   }
 })
 
