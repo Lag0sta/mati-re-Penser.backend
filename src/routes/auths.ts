@@ -3,7 +3,8 @@ import { Router } from 'express';
 import User from '../models/users';
 import { validate } from "../middlewares/validate";
 import { signInSchema, authSchema, logoutSchema } from "../schemas/auths.schema";
-
+import nodemailer from "nodemailer";
+import { randomBytes } from "node:crypto";
 import { checkToken } from '../utils/authActions';
 
 const router = Router();
@@ -95,6 +96,59 @@ router.put('/logout', validate(logoutSchema), async (req, res) => {
     } catch (error) {
         res.json({ result: false, message: 'Erreur interne du serveur' });
     }
+})
+
+
+router.post('/forgotPassword', async (req, res): Promise<void> => {
+  const { email } = req.body
+
+  if (!req.body.email) {
+    res.json({ result: false, error: 'fill the fields' });
+    return;
+  }
+
+  try {
+    const user = await User.findOne({ email })
+
+    if (!user) {
+      res.json({ result: false, error: 'User not found.' });
+      return;
+    }
+
+    const resetToken = randomBytes(32).toString('hex');
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = new Date(Date.now() + 3600000);
+    await user.save();
+
+    const mailMdp = process.env.MDP_MAIL
+    const mail = process.env.MAIL
+    const service = process.env.SERVICE
+
+    const transporter = nodemailer.createTransport({
+      service: service,
+      auth: {
+        user: `${mail}`,
+        pass: `${mailMdp}`,
+      },
+    });
+
+    const resetUrl = `http://localhost:3001/resetPassword/${resetToken}`;
+
+    const mailOptions = {
+      from: `${mail}`,
+      to: `${email}`,
+      subject: 'Réinitialisation de votre mot de passe',
+      html: `<p>Vous avez demandé une réinitialisation de mot de passe.</p>
+             <p>Cliquez sur ce lien pour le réinitialiser : <a href="${resetUrl}">Réinitialiser le mot de passe</a></p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.json({ result: true, message: 'Email de réinitialisation envoyé.' });
+  } catch (error) {
+    console.error(error);
+    res.json({ result: false, message: 'Erreur du serveur.' });
+  }
 })
 
 export default router;

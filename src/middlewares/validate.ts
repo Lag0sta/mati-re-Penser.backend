@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ZodType, ZodError } from "zod";
 
 export const validate = <T>(schema: ZodType<T>) =>
-  (req: Request, res: Response, next: NextFunction) => {
+  (req: Request, res: Response, next: NextFunction) : void => {
     try {
       const data: T = schema.parse(req.body);
       req.body = data;
@@ -25,15 +25,18 @@ export const validate = <T>(schema: ZodType<T>) =>
           };
         });
 
-        return res.status(400).json({
+        res.status(400).json({
           result: false,
           message: "Validation error",
           errors: formattedErrors,
         });
+        return 
       }
+      
 
-      return res.status(500).json({
+       res.status(500).json({
         message: "Internal server error",
       });
+      return
     }
   };
