@@ -10,6 +10,8 @@ import { checkToken } from '../utils/authActions';
 const router = Router();
 const bcrypt = require("bcryptjs");
 const uid2 = require('uid2');
+const API_URL = process.env.FRONTEND_URL || 'http://localhost:4000';
+
 
 //route pour la connection de l'utilisateur
 router.post('/signin', validate(signInSchema), async (req, res) => {
@@ -132,7 +134,7 @@ router.post('/forgotPassword', async (req, res): Promise<void> => {
       },
     });
 
-    const resetUrl = `http://localhost:3001/resetPassword/${resetToken}`;
+    const resetUrl = `${API_URL}/resetPassword/${resetToken}`;
 
     const mailOptions = {
       from: `${mail}`,
