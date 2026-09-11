@@ -121,22 +121,18 @@ router.post('/forgotPassword', async (req, res): Promise<void> => {
     user.resetPasswordExpires = new Date(Date.now() + 3600000);
     await user.save();
 
-    const mailMdp = process.env.MDP_MAIL
-    const mail = process.env.MAIL
-    const service = process.env.SERVICE
-
     const transporter = nodemailer.createTransport({
-      service: service,
+      service: process.env.SERVICE,
       auth: {
-        user: `${mail}`,
-        pass: `${mailMdp}`,
+        user: process.env.MAIL,
+        pass: process.env.MDP_MAIL,
       },
     });
 
     const resetUrl = `${API_URL}/resetPassword/${resetToken}`;
 
     const mailOptions = {
-      from: `${mail}`,
+      from: `${process.env.MAIL}`,
       to: `${email}`,
       subject: 'Réinitialisation de votre mot de passe',
       html: `<p>Vous avez demandé une réinitialisation de mot de passe.</p>
